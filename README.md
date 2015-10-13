@@ -16,6 +16,8 @@ angular-route
 
 angular-sanitize
 
+d3
+
 
 ## Maintainers/Sponsors
 
