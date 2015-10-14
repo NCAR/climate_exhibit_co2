@@ -9,6 +9,6 @@ config(["$routeProvider", function($routeProvider) {
             templateUrl: "templates/homepage.html", 
             controller: "homeCtrl"
         }
-    ).
-	otherwise({redirectTo: '/'});
+    )
+    .otherwise({redirectTo: '/'});
 }]);
