@@ -4,8 +4,6 @@ angular.module('co2.controllers', [])
     $scope.graph_height = $window.innerHeight/3 - 70;
     // ipad pro resolution is 2048x2732, so max height of each, with nav is 682
     
-    console.log($window.innerHeight);
-    
 })
 .controller('nwrCtrl', function($scope, contentData){
     $scope.file = "data/nwr.tsv";
