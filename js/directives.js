@@ -7,7 +7,7 @@ angular.module('co2.directives', ["co2.services"])
          },
          replace: false,
          link: function (scope, element, attrs) {
-           var fileLoc = attrs.file;
+            var fileLoc = attrs.file;
              var title = attrs.title;
              var parentDiv = attrs.parentdiv;
              var width = attrs.width;
