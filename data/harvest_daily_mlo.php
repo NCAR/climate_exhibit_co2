@@ -28,7 +28,7 @@ if(!empty($output) && !preg_match("/NaN/",$output)){
     $new_date = $a_new_date[0].'-'.$date['month'].'-'.$a_new_date[2];
     $new_value = $new_date."\t".trim($a_data[0])."\n";
     // open local file
-    $file = "mlo.tsv"; 
+    $file = "/web/sparkapps/climate_exhibit_co2/data/mlo.tsv"; 
 
     // if this value isn't the last value in the file then append
     $line = '';
