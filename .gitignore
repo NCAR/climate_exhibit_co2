@@ -1,2 +1,4 @@
 bower_components/*
-data/*
+data/*.tsv
+data/*.txt
+data/*.csv

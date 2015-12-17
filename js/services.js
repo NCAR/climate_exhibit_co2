@@ -11,6 +11,7 @@ angular.module('co2.services', [])
     .factory('d3Func', function() {
         var d3Func = {};
         d3Func.drawLineGraph = function(top, right, bottom, left, graphWidth, graphHeight, fileLoc, title, parentDiv, yLabel) {
+            
             var daysShown = 365;
 
             var margin = {
@@ -47,7 +48,6 @@ angular.module('co2.services', [])
                 .y(function(d) {
                     return yScale(d.CO2);
                 });
-
             var svg = d3.select("#" + parentDiv).append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -67,7 +67,7 @@ angular.module('co2.services', [])
 
             d3.tsv(fileLoc, function(error, data) {
                 if (error) throw error;
-
+                
                 // save off min and max values
                 var minN = d3.min(data, function(d) {
                         return parseDate(d.DATE);
@@ -81,9 +81,12 @@ angular.module('co2.services', [])
                         return d.CO2;
                     }),
                     yMax = d3.max(data, function(d) {
-                        return d.CO2;
+                        // can either go with the max value or hardset the ymax value
+                        //return d.CO2;
+                        return 490;
                     });
 
+                
                 var lastd = 0;
                 data.forEach(function(d) {
                     // just to be on the safe side, verify there are values
