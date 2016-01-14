@@ -1,9 +1,12 @@
-<div ng-controller="nwrCtrl" id="nwr">
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="nwr" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
-</div>
-<div ng-controller="splCtrl" id="spl">
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="spl" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
-</div>
 <div ng-controller="mloCtrl" id="mlo">
+    <h2>{{title}}</h2>
     <lines-chart file="{{file}}" title="{{title}}" parentDiv="mlo" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
 </div>
+<div ng-controller="nwrCtrl" id="nwr">
+    <h2>{{title}}</h2>
+    <lines-chart file="{{file}}" title="{{title}}" parentDiv="nwr" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
+</div>
+<!--//div ng-controller="splCtrl" id="spl">
+    <h2>{{title}}</h2>
+    <lines-chart file="{{file}}" title="{{title}}" parentDiv="spl" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
+</div//-->

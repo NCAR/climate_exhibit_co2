@@ -25,7 +25,7 @@ if(!empty($output) && !preg_match("/NaN/",$output)){
     $a_data = explode(',',$output);
     $a_new_date = explode('-',trim($a_data[1]));
     $date = date_parse($a_new_date[1]);
-    $new_date = $a_new_date[0].'-'.$date['month'].'-'.$a_new_date[2];
+    $new_date = $a_new_date[2].'-'.str_pad($date['month'], 2, '0', STR_PAD_LEFT).'-'.$a_new_date[0].'T12:00:00';
     $new_value = $new_date."\t".trim($a_data[0])."\n";
     // open local file
     $file = "/web/sparkapps/climate_exhibit_co2/data/mlo.tsv"; 

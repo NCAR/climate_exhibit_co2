@@ -12,7 +12,7 @@ angular.module('co2.directives', ["co2.services"])
              var parentDiv = attrs.parentdiv;
              var width = attrs.width;
              var height = attrs.height;
-           d3Func.drawLineGraph(20,20,30,50,width,height,fileLoc,title,parentDiv,"CO2 (ppm)");
+           d3Func.drawLineGraph(10,20,20,50,width,height,fileLoc,title,parentDiv,"CO\u2082 (ppm)");
          } 
       };
       return directiveDefinitionObject;

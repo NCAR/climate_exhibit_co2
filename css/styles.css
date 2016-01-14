@@ -1,36 +1,88 @@
-body {
-  font: 10px sans-serif;
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
 }
 
+body {
+    font: 10px sans-serif;
+}
+
+/* the x and y axis */
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 
-.x.axis path {
-  display: none;
-}
 
+
+/* the main graph line */
 .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
 }
 
+/* the area beneath the graph in the navigator */
 .navigator .data {
     fill: lightgrey;
     stroke-width: 0px;
 }
 
+/*
 .navigator .line {
     fill: none;
     stroke: darkgrey;
     stroke-width: 1px;
 }
+*/
+
+/* the viewport in the navigator */
 .navigator .viewport {
-    stroke: grey;
+    stroke: black;
     fill: black;
     fill-opacity: 0.2;
 }
+
+/* border around main graph */
+.mainGraphBorder {
+    stroke: #CCC;
+    fill: none;
+    stroke-width: 1;
+}
+
+/* grid tick lines */
+.grid .tick {
+    stroke: lightgrey;
+    opacity: 0.7;
+    stroke-width: 0.5;
+}
+
+
+/* for tooltip...if used
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.mousetip {
+    fill: #000;
+}
+
+.mousetipContainer {
+    fill: #fff;
+    stroke-width: 1;
+    stroke: #000;
+}
+
+.focus circle {
+    fill: red;
+    stroke: red;
+}
+*/
