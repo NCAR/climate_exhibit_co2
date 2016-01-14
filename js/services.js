@@ -10,8 +10,10 @@ angular.module('co2.services', [])
     }])
     .factory('d3Func', function () {
         var d3Func = {};
-        d3Func.drawLineGraph = function (top, right, bottom, left, graphWidth, graphHeight, fileLoc, title, parentDiv, yLabel) {
+        d3Func.drawLineGraph = function (top, right, bottom, left, graphWidth, graphHeight, fileLoc, title, parentDiv, yLabel) { 
+            // functionality based on: http://blog.scottlogic.com/2014/09/19/interactive.html
 
+            // init show 1 year
             var daysShown = 365;
 
             var margin = {
@@ -31,17 +33,15 @@ angular.module('co2.services', [])
                 formatCO2 = function (d) {
                     return "CO\u2082: " + formatValue(d);
                 };
-            //var parseDate = d3.time.format("%d-%m-%Y").parse;
-
-
-
-
+            
+            // create x and y scales
             var xScale = d3.time.scale()
                 .range([0, width]);
 
             var yScale = d3.scale.linear()
                 .range([height, 0]);
 
+            // basic setup to be able to draw axes on chart
             var xAxis = d3.svg.axis()
                 .scale(xScale)
                 .ticks(12)
@@ -68,7 +68,7 @@ angular.module('co2.services', [])
                     .ticks(5)
             };
 
-            // actual graphed line
+            // settings for the actual graphed line
             var line = d3.svg.line()
                 .x(function (d) {
                     return xScale(d.DATE);
@@ -76,16 +76,16 @@ angular.module('co2.services', [])
                 .y(function (d) {
                     return yScale(d.CO2);
                 });
+            
+            // plotchart
             var svg = d3.select("#" + parentDiv).append("svg")
+                .attr('class','plot')
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-
-
-
+            // plotarea
             var svgArea = svg.append('g')
                 .attr('clip-path', 'url(#svgAreaClip)');
 
@@ -100,7 +100,7 @@ angular.module('co2.services', [])
             d3.tsv(fileLoc, function (error, data) {
                 if (error) throw error;
 
-                // save off min and max values for date/x values
+                // save off min and max values for date/x and CO2/y values
                 var minN = d3.min(data, function (d) {
                         return parseDate(d.DATE);
                     }).getTime(),
@@ -133,9 +133,9 @@ angular.module('co2.services', [])
                 });
 
                 yScale.domain([yMin, yMax]).nice();
-                //yScale.domain([350,450]).nice();
                 xScale.domain([minDate, maxDate]);
 
+                // draw axis on chart
                 svg.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate(0," + height + ")")
@@ -150,6 +150,14 @@ angular.module('co2.services', [])
                     .style("text-anchor", "end")
                     .text(yLabel);
 
+                // draw y axis grid lines                    
+                svg.append("g")
+                    .attr("class", "y grid")
+                     .call(make_y_axis()
+                         .tickSize(-width, 0, 0)
+                            .tickFormat("")
+                )
+                
                 // draw border around graph
                 var lineData = [
                     {
@@ -178,6 +186,7 @@ angular.module('co2.services', [])
                     .attr("d", lineFunc(lineData))
                     .attr("class", "mainGraphBorder");
 
+                // data series the graphed line
                 var dataSeries = function () {
                     return svgArea.append('path')
                         .attr('class', 'line')
@@ -186,9 +195,11 @@ angular.module('co2.services', [])
 
                 //dataSeries();
 
+                // navigation settings
                 var navWidth = width,
                     navHeight = 100 - margin.top - margin.bottom;
 
+                // set up navigation drawing area
                 var navChart = d3.select("#" + parentDiv).classed('chart', true).append('svg')
                     .classed('navigator', true)
                     .attr('width', navWidth + margin.left + margin.right)
@@ -196,6 +207,7 @@ angular.module('co2.services', [])
                     .append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+                // define navigation x and y scales
                 var navXScale = d3.time.scale()
                     .domain([minDate, maxDate])
                     .range([0, navWidth]),
@@ -203,6 +215,7 @@ angular.module('co2.services', [])
                     .domain([yMin, yMax])
                     .range([navHeight, 0]);
 
+                // define only the x axis for chart
                 var navXAxis = d3.svg.axis()
                     .scale(navXScale)
                     .orient('bottom');
@@ -212,6 +225,7 @@ angular.module('co2.services', [])
                     .attr('transform', 'translate(0,' + navHeight + ')')
                     .call(navXAxis);
 
+                // area under nav line
                 var navData = d3.svg.area()
                     .x(function (d) {
                         return navXScale(d.DATE);
@@ -221,6 +235,7 @@ angular.module('co2.services', [])
                         return navYScale(d.CO2);
                     });
 
+                // nav line
                 var navLine = d3.svg.line()
                     .x(function (d) {
                         return navXScale(d.DATE);
@@ -284,12 +299,12 @@ angular.module('co2.services', [])
 
                 function redrawChart() {
                     // delete plot
-                    d3.select("#" + parentDiv + " .line").remove();
+                    d3.select("#" + parentDiv + " .plot .line").remove();
 
                     // remove x grid lines
                     d3.select("#" + parentDiv + " .x.grid").remove();
                     // remove y grid lines
-                    d3.select("#" + parentDiv + " .y.grid").remove();
+                    //d3.select("#" + parentDiv + " .y.grid").remove();
 
                     // redraw x axis grid lines
                     svg.append("g")
@@ -299,21 +314,16 @@ angular.module('co2.services', [])
                             .tickSize(-height, 0, 0)
                             .tickFormat("")
                         );
-                    // redraw y axis grid lines                    
-                    svg.append("g")
-                        .attr("class", "y grid")
-                        .call(make_y_axis()
-                            .tickSize(-width, 0, 0)
-                            .tickFormat("")
-                        );
+                    
 
                     // redraw plot
                     dataSeries();
                     svg.select('.x.axis').call(xAxis);
-                    svg.select('.y.axis').call(yAxis);
+                    //svg.select('.y.axis').call(yAxis);
 
                 }
 
+                // update viewport with main chart dimensions
                 function updateViewportFromChart() {
                     if ((xScale.domain()[0] <= minDate) && (xScale.domain()[1] >= maxDate)) {
 
@@ -326,9 +336,10 @@ angular.module('co2.services', [])
                     navChart.select('.viewport').call(viewport);
                 }
 
+                // viewport brush event
                 var viewport = d3.svg.brush()
                     .x(navXScale)
-                    .on("brushend", function () {
+                    .on("brush", function () {
                         xScale.domain(viewport.empty() ? navXScale.domain() : viewport.extent());
                         redrawChart();
                     });
@@ -339,6 +350,8 @@ angular.module('co2.services', [])
                     .selectAll("rect")
                     .attr("height", navHeight);
 
+                // zoom in, zoom out, or pan
+                // prevent panning off data range
                 var zoom = d3.behavior.zoom()
                     .x(xScale)
                     .on('zoom', function () {
@@ -353,10 +366,21 @@ angular.module('co2.services', [])
                         updateViewportFromChart();
                     });
 
-                viewport.on("brush", function () {
+                
+              var overlay = d3.svg.area()
+                .x(function (d) { return xScale(d.DATE); })
+                .y0(0)
+                .y1(height);
+
+              svgArea.append('path')
+                .attr('class', 'overlay')
+                .attr('d', overlay(data))
+                .call(zoom);
+              
+                // ensure zoom updated when viewport changes
+                viewport.on("brushend", function () {
                     updateZoomFromChart();
                 });
-
                 function updateZoomFromChart() {
                     zoom.x(xScale);
 
@@ -369,8 +393,17 @@ angular.module('co2.services', [])
                     zoom.scaleExtent([minScale, maxScale]);
                 }
 
+                // default viewport range
+                // remember that each chart is a different units of time
+                var units = 0;
+                if(parentDiv == 'nwr'){
+                    // hourly data
+                    units = daysShown * 24;
+                } else {
+                    units = daysShown;
+                }
                 xScale.domain([
-                    data[data.length - daysShown - 1].DATE,
+                    data[data.length - units - 1].DATE,
                     data[data.length - 1].DATE
                 ]);
 
