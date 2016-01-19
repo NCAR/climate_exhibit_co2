@@ -17,7 +17,7 @@ while(!feof($f))
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
         if(isset($a_data[8])){
-            $co2_value = trim($a_data[8]);
+            $co2_value = trim($a_data[10]);
             if($co2_value != 'NaN' && $co2_value > 0){       
                 $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
                 $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);

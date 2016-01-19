@@ -12,7 +12,8 @@ angular.module('co2.directives', ["co2.services"])
              var parentDiv = attrs.parentdiv;
              var width = attrs.width;
              var height = attrs.height;
-           d3Func.drawLineGraph(10,20,20,50,width,height,fileLoc,title,parentDiv,"CO\u2082 (ppm)");
+             var bucketSize = attrs.bucketsize;
+           d3Func.drawLineGraph(10,20,20,50,width,height,fileLoc,title,parentDiv,"CO\u2082 (ppm)",bucketSize);
          } 
       };
       return directiveDefinitionObject;

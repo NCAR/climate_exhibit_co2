@@ -16,7 +16,10 @@ angular-route
 
 angular-sanitize
 
-d3
+
+use npm to install the following
+
+d3fc - this will install d3 which is also included
 
 ## Instructions
 
