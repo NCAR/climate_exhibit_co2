@@ -25,10 +25,19 @@ body {
 /* the main graph line */
 .line {
     fill: none;
-    stroke: steelblue;
+    /*stroke: steelblue;*/
     stroke-width: 2px;
 }
-
+.mlo {
+    
+    
+}
+.nwr {
+    
+}
+.ml {
+    
+}
 /* the area beneath the graph in the navigator */
 .navigator .data {
     fill: lightgrey;
