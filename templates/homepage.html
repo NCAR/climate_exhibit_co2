@@ -1,19 +1,7 @@
-<div ng-controller="mloCtrl" id="mlo">
-    <h2>{{title}}</h2>
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="mlo" width="{{device_width}}" height="{{graph_height}}" bucketSize="{{bucket_size}}" yMin="{{y_min}}" yMax="{{y_max}}" minDate="{{min_date}}" maxDate="{{max_date}}"></lines-chart>
+<div ng-controller="mloCtrl" class="mlo">
+    <button ng-click="generateImageUrl('mlo');" class="toggle">Toggle MLO Range</button>
+    <graph-generator></graph-generator>
 </div>
-<div ng-controller="nwrCtrl" id="nwr">
-    <h2>{{title}}</h2>
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="nwr" width="{{device_width}}" height="{{graph_height}}" bucketSize="{{bucket_size}}" yMin="{{y_min}}" yMax="{{y_max}}" minDate="{{min_date}}" maxDate="{{max_date}}"></lines-chart>
+<div ng-controller="nwrCtrl">
+    <graph-generator></graph-generator>
 </div>
-
-
-<!--//div ng-controller="chartCtrl" id="chart">
-    <h2>{{title}}</h2>
-    <co2-chart plot_values="{{plotValues}}" plot_attr="{{plotAttr}}"></co2-chart>
-</div//-->
-
-<!--//div ng-controller="splCtrl" id="spl">
-    <h2>{{title}}</h2>
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="spl" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
-</div//-->

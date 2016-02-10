@@ -1,104 +1,46 @@
 * {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
+    font-family: Helvetica, Arial, sans-serif;
+    margin:0;
 }
 
-body {
-    font: 10px sans-serif;
+.axis_y {
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+    /* IE */
+    -ms-transform: rotate(-90deg);
+    /* Opera */
+    -o-transform: rotate(-90deg);
+    /* Internet Explorer */
+    filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3);
+    left: -85px;
+    position: absolute;
+    font-weight:normal;
+    bottom:135px;
 }
-
-/* the x and y axis */
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
+.axis_x,
+.axis_y {
+    font-size: .8em;
+    color:#333;
 }
-
-
-
-/* the main graph line */
-.line {
-    fill: none;
-    /*stroke: steelblue;*/
-    stroke-width: 2px;
+button.toggle{
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    z-index: 100;
 }
-.mlo {
-    
-    
+.title {
+    font-size: 1em;
 }
-.nwr {
-    
+.graph {
+    position: relative;
+    display: inline-block;
 }
-.ml {
-    
+.graph img{
+    margin-left:20px;
 }
-/* the area beneath the graph in the navigator */
-.navigator .data {
-    fill: lightgrey;
-    stroke-width: 0px;
+.title,
+.axis_x {
+    text-align: center;
 }
-
-
-.navigator .line {
-    fill: none;
-    stroke: darkgrey;
-    stroke-width: 1px;
-}
-
-
-/* the viewport in the navigator */
-.navigator .viewport {
-    stroke: grey;
-    fill: black;
-    fill-opacity: 0.2;
-}
-
-/* border around main graph */
-.mainGraphBorder {
-    stroke: #CCC;
-    fill: none;
-    stroke-width: 1;
-}
-
-/* grid tick lines */
-.grid .tick {
-    stroke: lightgrey;
-    opacity: 0.7;
-    stroke-width: 0.5;
-}
-
-.plot .overlay {
-    stroke-width: 0px;
-    fill-opacity: 0;
-}
-
-.tick text {
-    font-size:16px;
-}
-/* for tooltip...if used
-.overlay {
-    fill: none;
-    pointer-events: all;
-}
-
-.mousetip {
-    fill: #000;
-}
-
-.mousetipContainer {
-    fill: #fff;
-    stroke-width: 1;
-    stroke: #000;
-}
-
-.focus circle {
-    fill: red;
-    stroke: red;
-}
-*/

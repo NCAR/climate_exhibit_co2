@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html lang="en-US" ng-app="co2">
+<html lang="en-US" ng-app="edu.ucar.scied.co2">
+    <head>
     <title>CO2</title>
-    <link href="node_modules/d3fc/dist/d3fc.css" rel="stylesheet"/>
     <link href="css/styles.css" rel="stylesheet">
   </head>
   <body>
 <div ng-view></div>
       
-    <script src="node_modules/d3fc/node_modules/d3/d3.min.js"></script>
-    <script src="node_modules/d3fc/node_modules/css-layout/dist/css-layout.js"></script>
-    <script src="node_modules/d3fc/node_modules/svg-innerhtml/svg-innerhtml.js"></script>
-    <script src="node_modules/d3fc/dist/d3fc.js"></script>
-    <script src="bower_components/angular/angular.min.js"></script>
-    <script src="bower_components/angular-route/angular-route.min.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="/core/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/core/bower_components/angular/angular.min.js"></script>
+    <script src="/core/bower_components/angular-route/angular-route.min.js"></script>
+    <script src="/core/bower_components/angular-sanitize/angular-sanitize.min.js"></script>    
     <script src="js/app.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/directives.js"></script>
-    <script src="js/controllers.js"></script>
+    <script src="/core/js/base/services.js"></script>
+    <script src="js/directives.co2.js"></script>
+    <script src="js/controllers.co2.js"></script>
   </body>
 </html>

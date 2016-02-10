@@ -1,6 +1,6 @@
-angular.module("co2", ["co2.controllers", 
-                           "co2.services",
-                           "co2.directives",
+angular.module("edu.ucar.scied.co2", ["edu.ucar.scied.controllers.co2", 
+                                      "edu.ucar.scied.services",
+                           "edu.ucar.scied.directives.co2",
                            "ngRoute"]).
 config(["$routeProvider", function($routeProvider) {
   $routeProvider.
