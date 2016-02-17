@@ -92,16 +92,6 @@ if(array_key_exists('x_range_high',$_GET) && !empty($_GET['x_range_high'])){
     $a_range['x_high'] = "";
 }
 
-switch($source){
-    case 'nwr';
-        $file = $baseurl.'data/nwr.tsv';
-        break;
-    case 'mlo':
-        $file = $baseurl.'data/mlo.tsv';
-        break;
-}
-
-
 $dateUtils = new DateScaleUtils();
 
 function readData($sitecode, $a_range, &$aXData, &$aYData){
@@ -141,7 +131,23 @@ function readData($sitecode, $a_range, &$aXData, &$aYData){
 $xdata = array();
 $ydata = array();
 $server = mysql_connect($host, $username, $password);
-    $connection = mysql_select_db($database, $server);
+$connection = mysql_select_db($database, $server);
+
+// get max and min values over all
+$yMax = 450;
+$yMin = 0;
+$myquery = "SELECT MIN(co2_value) as ymin, MAX(co2_value) as ymax FROM climate_co2_data WHERE active='1'";
+$query = mysql_query($myquery);
+if ( ! $query ) {
+    echo mysql_error();
+    die;
+}
+$numrows = mysql_num_rows($query);
+if($numrows == 1){
+    $data = mysql_fetch_assoc($query);
+    $yMin = $data['ymin'];
+    $yMax = $data['ymax'];
+ }
 //readData($file,$a_range, $xdata,$ydata);
 readData($source,$a_range, $xdata,$ydata);
  
@@ -174,7 +180,8 @@ $graph->xaxis->SetTickPositions($tickPos,$minTickPos);
 if(!empty($axis_y)){
     $graph->yaxis->title->Set($axis_y);
 }
- 
+$graph->yaxis->scale->SetAutoMax($yMax); 
+$graph->yaxis->scale->SetAutoMin($yMin); 
 // Create the linear plot
 $lineplot=new LinePlot($ydata,$xdata);
  
