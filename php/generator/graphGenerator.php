@@ -3,11 +3,12 @@
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $baseurl = 'J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\';
     $path = 'J:\\Sharon\\xampp\\htdocs\\libraries\\php\\jpgraph\\src\\';
+    require 'J:\\Sharon\\db\\credentials\\credentials.php';
 } else {    
     $baseurl = '/web/sparkapps/climate_exhibit_co2/';
     $path = "/web/sparkapps/libraries/php/jpgraph/src/";
+    require '/home/sclark/db/credentials/credentials.php';
 }
-
 
 // require
 require_once ($path.'jpgraph.php');
@@ -102,44 +103,49 @@ switch($source){
 
 
 $dateUtils = new DateScaleUtils();
-// Some data
-function readData($aFile, $a_range, &$aXData, &$aYData) {
-    $lines = file($aFile,FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
-    if( $lines === false ) {
-        throw new JpGraphException('Can not read data file.');
+
+function readData($sitecode, $a_range, &$aXData, &$aYData){
+    $myquery = "SELECT co2_value as value, timestamp_co2_recorded as timestamp FROM climate_co2_data WHERE sitecode='$sitecode' AND active='1'";
+    $query = mysql_query($myquery);
+    if ( ! $query ) {
+        echo mysql_error();
+        die;
     }
-    foreach( $lines as $line => $datarow ) {
-        // skip first line
-        if(!preg_match('#DATE#',$datarow)){
+
+    $numrows = mysql_num_rows($query);
+    if($numrows > 0){
+        
+        for ($x = 0; $x < $numrows; $x++) {
             $f_add = true;
-            $split = explode("\t",$datarow);
-            $date_str = str_replace('T',' ',(trim($split[0])));
-            $date = new DateTime($date_str);
-            $timestamp = $date->getTimestamp();
-            
+            $data = mysql_fetch_assoc($query);
             if(!empty($a_range['x_low'])){
-              if($timestamp < $a_range['x_low']) {
+              if($data['timestamp'] < $a_range['x_low']) {
                   $f_add = false;
               } 
             }
             if(!empty($a_range['x_high'])){
-              if($timestamp < $a_range['x_high']) {
+              if($data['timestamp'] < $a_range['x_high']) {
                   $f_add = false;
               } 
             }
            
             if($f_add == true){
-                $aXData[] = $timestamp;
-                $aYData[] = trim($split[1]);
+                $aXData[] = $data['timestamp'];
+                $aYData[] = $data['value'];
             }
-        }
+        }    
+            
     }
+
 }
- 
 $xdata = array();
 $ydata = array();
-readData($file,$a_range, $xdata,$ydata);
-
+$server = mysql_connect($host, $username, $password);
+    $connection = mysql_select_db($database, $server);
+//readData($file,$a_range, $xdata,$ydata);
+readData($source,$a_range, $xdata,$ydata);
+ 
+    mysql_close($server);
 // Create a graph instance
 $graph = new Graph($width,$height);
 $graph->SetMargin($margin_left,$margin_right,$margin_top,$margin_bottom);
