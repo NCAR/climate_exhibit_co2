@@ -5,8 +5,14 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $path = 'J:\\Sharon\\xampp\\htdocs\\libraries\\php\\jpgraph\\src\\';
     require 'J:\\Sharon\\db\\credentials\\credentials.php';
 } else {    
-    $baseurl = '/web/sparkapps/climate_exhibit_co2/';
-    $path = "/web/sparkapps/libraries/php/jpgraph/src/";
+    $host = $_SERVER['SERVER_NAME'];
+    if($host == 'test.apps.spark.ucar.edu'){
+        $baseurl = '/test/sparkapps/climate_exhibit_co2/';
+        $path = "/test/sparkapps/libraries/php/jpgraph/src/";
+    } else {
+        $baseurl = '/web/sparkapps/climate_exhibit_co2/';
+        $path = "/web/sparkapps/libraries/php/jpgraph/src/";
+    }
     require '/home/sclark/db/credentials/credentials.php';
 }
 
