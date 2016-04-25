@@ -17,6 +17,12 @@ angular.module('edu.ucar.scied.controllers.co2', [])
 
 
     })
+    .controller('mlbCtrl', function ($scope) {
+        $scope.file = "data/mlb.tsv";
+        $scope.title = "Mesa Laboratory (MLB)"
+        $scope.source = "mlb";
+        $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
+    })
     .controller('nwrCtrl', function ($scope) {
         $scope.file = "data/nwr.tsv";
         $scope.title = "Niwot Ridge (NWR)"
