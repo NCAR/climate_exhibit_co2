@@ -1,6 +1,7 @@
 
 body {
     background-color:#fff;
+    width:1024px;
 }
 .axis_y {
     /* Safari */
@@ -13,7 +14,7 @@ body {
     -o-transform: rotate(-90deg);
     /* Internet Explorer */
     filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3);
-    left: -100px;
+    left: -50px;
     position: absolute;
     font-weight:normal;
     top:400px;
@@ -60,7 +61,7 @@ body {
 }
 
 .credits {
-    margin-left:275px;
+    
 }
 .creditspage {
     margin:20px;

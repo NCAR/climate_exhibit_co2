@@ -35,13 +35,13 @@ require_once ($path.'jpgraph_utils.inc.php');
 if(array_key_exists('height',$_GET) && !empty($_GET['height'])){
     $height = $_GET['height'];
 } else {
-    $height = 1080;
+    $height = 1000;
 }
 // width
 if(array_key_exists('width',$_GET) && !empty($_GET['width'])){
     $width = $_GET['width'];
 } else {
-    $width = 1620;
+    $width = 1350;
 }
 //margin top
 if(array_key_exists('top',$_GET) && !empty($_GET['top'])){
