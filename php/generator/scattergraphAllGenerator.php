@@ -65,7 +65,7 @@ if(array_key_exists('bottom',$_GET) && !empty($_GET['bottom'])){
 if(array_key_exists('right',$_GET) && !empty($_GET['right'])){
     $margin_right = $_GET['right'];
 } else {
-    $margin_right = 0;
+    $margin_right = 100;
 }
 
 // range
@@ -222,7 +222,7 @@ $sp2 = new ScatterPlot($ydata2,$xdata2);
 $sp2->mark->SetType(MARK_UTRIANGLE);
 $sp2->mark->SetFillColor($fillcolor2);
 $sp2->mark->SetColor($bordercolor2);
-$sp2->mark->SetWidth(3);
+$sp2->mark->SetWidth(5);
 $graph->Add($sp2);
 
 
@@ -235,7 +235,7 @@ $sp1 = new ScatterPlot($ydata1,$xdata1);
 $sp1->mark->SetType(MARK_SQUARE);
 $sp1->mark->SetFillColor($fillcolor1);
 $sp1->mark->SetColor($bordercolor1);
-$sp1->mark->SetWidth(3);
+$sp1->mark->SetWidth(5);
 $graph->Add($sp1);
 
 // for mlo data
@@ -248,7 +248,7 @@ $sp0 = new ScatterPlot($ydata0,$xdata0);
 $sp0->mark->SetType(MARK_FILLEDCIRCLE);
 $sp0->mark->SetFillColor($fillcolor0);
 $sp0->mark->SetColor($bordercolor0);
-$sp0->mark->SetWidth(3); 
+$sp0->mark->SetWidth(5); 
 $graph->Add($sp0);
 
 

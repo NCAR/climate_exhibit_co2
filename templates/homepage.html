@@ -9,11 +9,11 @@
 </div//-->
 <div ng-controller="graphCtrl">
     <div class="btnCont">
-        <button ng-click="generateImageUrl('sixtyyear');" class="toggle">60 years</button>
-        <button ng-click="generateImageUrl('tenyear');" class="toggle">10 years</button>
-        <button ng-click="generateImageUrl('oneyear');" class="toggle">1 year</button>
-        <button ng-click="generateImageUrl('onemonth');" class="toggle">1 month</button>
-        <button ng-click="generateImageUrl('oneweek');" class="toggle">1 week</button>
+        <button ng-click="generateImageUrl('sixtyyear');" class="toggle" ng-class="{active: range == 'sixtyyear'}">60 years</button>
+        <button ng-click="generateImageUrl('tenyear');" class="toggle" ng-class="{active: range == 'tenyear'}">10 years</button>
+        <button ng-click="generateImageUrl('oneyear');" class="toggle" ng-class="{active: range == 'oneyear'}">1 year</button>
+        <button ng-click="generateImageUrl('onemonth');" class="toggle" ng-class="{active: range == 'onemonth'}">1 month</button>
+        <button ng-click="generateImageUrl('oneweek');" class="toggle" ng-class="{active: range == 'oneweek'}">1 week</button>
     </div>
     <graph-generator></graph-generator>
 </div>
