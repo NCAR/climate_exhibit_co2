@@ -273,11 +273,11 @@ $graph->xaxis->scale->SetTimeAlign( MINADJ_1 );
 unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);
 unset($xdata0,$ydata0);
-$filename = $imagedir.'/'.$imagename.'.jpg';
+$filename = $imagedir.$imagename.'.jpg';
 
 // before rendering, delete the existing, if it exists
 unlink($filename);
-
+echo "writing to ".$filename;
 // render graph
 $graph->Stroke($filename);
 
