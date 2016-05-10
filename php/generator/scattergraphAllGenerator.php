@@ -1,4 +1,5 @@
 <?php 
+error_reporting(E_ALL);
 ini_set('memory_limit', '1024M'); // or you could use 1G
 // vars
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -34,13 +35,13 @@ require_once ($path.'jpgraph_utils.inc.php');
 if(array_key_exists('height',$_GET) && !empty($_GET['height'])){
     $height = $_GET['height'];
 } else {
-    $height = 1080;
+    $height = 1920;
 }
 // width
 if(array_key_exists('width',$_GET) && !empty($_GET['width'])){
     $width = $_GET['width'];
 } else {
-    $width = 1920;
+    $width = 2732;
 }
 //margin top
 if(array_key_exists('top',$_GET) && !empty($_GET['top'])){
@@ -52,7 +53,7 @@ if(array_key_exists('top',$_GET) && !empty($_GET['top'])){
 if(array_key_exists('left',$_GET) && !empty($_GET['left'])){
     $margin_left = $_GET['left'];
 } else {
-    $margin_left = 40;
+    $margin_left = 100;
 }
 // margin bottom
 if(array_key_exists('bottom',$_GET) && !empty($_GET['bottom'])){
@@ -210,6 +211,7 @@ $graph->xaxis->SetLabelAngle(90);
 // Setup Y-axis title
 $graph->yaxis->scale->SetAutoMax($yMax); 
 $graph->yaxis->scale->SetAutoMin($yMin); 
+$graph->yaxis->SetFont(FF_FONT2,FS_NORMAL,48);
 
 
 // for mesa lab data
@@ -254,9 +256,10 @@ $sp0->SetLegend("Mauna Loa");
 $sp1->SetLegend("Niwot Ridge");
 $sp2->SetLegend("Mesa Lab");
 $graph->legend->SetFrameWeight(1);
+$graph->legend->SetFont(FF_FONT2,FS_NORMAL,96);
 $graph->legend->SetColumns(3);
 $graph->legend->SetColor('#4E4E4E','#00A78A');
-$graph->legend->SetAbsPos($width/2-100,$height-2,'right','bottom');
+$graph->legend->SetAbsPos($width/2-100,$height-200,'right','bottom');
 
 
 if($range == 'oneweek' || $range == 'oneday'){
@@ -268,6 +271,7 @@ list($tickPos,$minTickPos) = $dateUtils->getTicks($myscale,$tickCond);
 $graph->xaxis->SetPos('min');
 $graph->xaxis->SetMajTickPositions($tickPos);
 $graph->xaxis->scale->SetTimeAlign( MINADJ_1 );
+$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,48);
 
 
 unset($xdata2,$ydata2);

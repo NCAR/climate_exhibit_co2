@@ -1,10 +1,19 @@
-<div ng-controller="mloCtrl" class="mlo">
-    <button ng-click="generateImageUrl('mlo');" class="toggle">Toggle MLO Range</button>
+<!--//div ng-controller="mloCtrl" class="mlo">
     <graph-generator></graph-generator>
 </div>
 <div ng-controller="nwrCtrl">
     <graph-generator></graph-generator>
 </div>
 <div ng-controller="mlbCtrl">
+    <graph-generator></graph-generator>
+</div//-->
+<div ng-controller="graphCtrl">
+    <div class="btnCont">
+        <button ng-click="generateImageUrl('sixtyyear');" class="toggle">60 years</button>
+        <button ng-click="generateImageUrl('tenyear');" class="toggle">10 years</button>
+        <button ng-click="generateImageUrl('oneyear');" class="toggle">1 year</button>
+        <button ng-click="generateImageUrl('onemonth');" class="toggle">1 month</button>
+        <button ng-click="generateImageUrl('oneweek');" class="toggle">1 week</button>
+    </div>
     <graph-generator></graph-generator>
 </div>

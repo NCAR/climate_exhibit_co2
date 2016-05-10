@@ -17,18 +17,12 @@
     left: -85px;
     position: absolute;
     font-weight:normal;
-    bottom:135px;
+    top:200px;
 }
 .axis_x,
 .axis_y {
     font-size: .8em;
     color:#333;
-}
-button.toggle{
-    position: absolute;
-    right: 10px;
-    top: 5px;
-    z-index: 100;
 }
 .title {
     font-size: 1em;
@@ -42,5 +36,10 @@ button.toggle{
 }
 .title,
 .axis_x {
+    text-align: center;
+}
+.btnCont {
+    margin-left: auto;
+    margin-right: auto;
     text-align: center;
 }
