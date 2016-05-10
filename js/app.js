@@ -10,5 +10,11 @@ config(["$routeProvider", function($routeProvider) {
             controller: "homeCtrl"
         }
     )
+  .when("/credits", 
+         {
+            templateUrl: "templates/credits.html", 
+            controller: "creditsCtrl"
+        }
+    )
     .otherwise({redirectTo: '/'});
 }]);

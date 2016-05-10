@@ -2,7 +2,7 @@ angular.module('edu.ucar.scied.controllers.co2', [])
     .controller('homeCtrl', function ($scope, $window) {
         $scope.device_width = Math.floor($window.innerWidth);
         $scope.device_height = Math.floor($window.innerHeight);
-        $scope.graph_height = Math.floor(($scope.device_height)-100);
+        $scope.graph_height = Math.floor(($scope.device_height) - 100);
         // ipad pro resolution is 2048x2732, so max height of each, with nav is 682
 
         $scope.top = 10;
@@ -15,27 +15,32 @@ angular.module('edu.ucar.scied.controllers.co2', [])
 
         $scope.range = "tenyear";
 
-    $scope.generateImageUrl = function (range) {
+        $scope.generateImageUrl = function (range) {
             $scope.range = range;
         };
 
     })
-
-    .controller('graphCtrl', function ($scope) {
-       // $scope.file = "data/mlb.tsv";
-       // $scope.title = "Mesa Laboratory (MLB)"
-       // $scope.source = "mlb";
+.controller('creditsCtrl', function ($scope, $location){
+    $scope.displayHome = function(){
+            $location.path("/");
+        };
+})
+.controller('graphCtrl', function ($scope,$location) {
         $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
-    
+
         $scope.bordercolor = 'CC0000';
         $scope.fillcolor = '660000';
+    
+        $scope.displayCredits = function(){
+            $location.path("/credits");
+        };
     })
     .controller('mlbCtrl', function ($scope) {
         $scope.file = "data/mlb.tsv";
         $scope.title = "Mesa Laboratory (MLB)"
         $scope.source = "mlb";
         $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
-    
+
         $scope.bordercolor = 'CC0000';
         $scope.fillcolor = '660000';
     })
@@ -44,7 +49,7 @@ angular.module('edu.ucar.scied.controllers.co2', [])
         $scope.title = "Niwot Ridge (NWR)"
         $scope.source = "nwr";
         $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
-    
+
         $scope.bordercolor = '0000FF';
         $scope.fillcolor = '000066';
     })

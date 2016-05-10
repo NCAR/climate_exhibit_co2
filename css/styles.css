@@ -53,19 +53,24 @@ button{
     border-radius: 15px;
     display:inline;
     margin-right:20px;
+    color:#fff;
+    background-color:#0A76BE;
 }
 button.active {
     background-color:#FF9900;
 }
 
-.credits.ucar {
-    bottom: 60px;
+.credits {
+    right:20px;
     position: absolute;
-    right: 30px;
 }
-
-.credits.mlo {
-    bottom: 60px;
-    position: absolute;
-    left: 30px;
+.creditspage {
+    margin:20px;
+    font-size: 24px;
+}
+.creditspage p {
+    margin-bottom:20px;
+}
+.homeBtn {
+    width:300px;
 }
