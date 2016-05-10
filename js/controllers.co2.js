@@ -20,19 +20,19 @@ angular.module('edu.ucar.scied.controllers.co2', [])
         };
 
     })
-.controller('creditsCtrl', function ($scope, $location){
-    $scope.displayHome = function(){
-            $location.path("/");
+.controller('creditsCtrl', function ($scope){
+        $scope.displayHome = function(){
+            window.location.href="#/";
         };
 })
-.controller('graphCtrl', function ($scope,$location) {
+.controller('graphCtrl', function ($scope) {
         $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
 
         $scope.bordercolor = 'CC0000';
         $scope.fillcolor = '660000';
     
         $scope.displayCredits = function(){
-            $location.path("/credits");
+            window.location.href="#/credits";
         };
     })
     .controller('mlbCtrl', function ($scope) {
