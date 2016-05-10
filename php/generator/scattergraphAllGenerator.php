@@ -35,13 +35,13 @@ require_once ($path.'jpgraph_utils.inc.php');
 if(array_key_exists('height',$_GET) && !empty($_GET['height'])){
     $height = $_GET['height'];
 } else {
-    $height = 1920;
+    $height = 1080;
 }
 // width
 if(array_key_exists('width',$_GET) && !empty($_GET['width'])){
     $width = $_GET['width'];
 } else {
-    $width = 2732;
+    $width = 1620;
 }
 //margin top
 if(array_key_exists('top',$_GET) && !empty($_GET['top'])){
@@ -59,7 +59,7 @@ if(array_key_exists('left',$_GET) && !empty($_GET['left'])){
 if(array_key_exists('bottom',$_GET) && !empty($_GET['bottom'])){
     $margin_bottom = $_GET['bottom'];
 } else {
-    $margin_bottom = 50;
+    $margin_bottom = 0;
 }
 // margin right
 if(array_key_exists('right',$_GET) && !empty($_GET['right'])){
@@ -259,10 +259,10 @@ $graph->legend->SetFrameWeight(1);
 $graph->legend->SetFont(FF_FONT2,FS_NORMAL,96);
 $graph->legend->SetColumns(3);
 $graph->legend->SetColor('#4E4E4E','#00A78A');
-$graph->legend->SetAbsPos($width/2-100,$height-200,'right','bottom');
+$graph->legend->SetAbsPos($width/2-100,$height-100,'right','bottom');
 
 
-if($range == 'oneweek' || $range == 'oneday'){
+if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
     $myscale = $xdata1;
 } else {
     $myscale = $xdata0;

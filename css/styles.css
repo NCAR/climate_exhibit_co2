@@ -14,14 +14,14 @@
     -o-transform: rotate(-90deg);
     /* Internet Explorer */
     filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3);
-    left: -200px;
+    left: -100px;
     position: absolute;
     font-weight:normal;
-    top:500px;
+    top:400px;
 }
 .axis_x,
 .axis_y {
-    font-size: 2em;
+    font-size: 1em;
     color:#333;
 }
 .title {
@@ -41,12 +41,31 @@
 .btnCont {
     margin-top: 20px;
     margin-left:55px;
+    margin-left:80px;
+    width:1620px;
 }
 button{
     font-size: 28px;
     height: 75px;
-    width: 200px;
+    width: 175px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    display:inline;
+    margin-right:20px;
 }
 button.active {
     background-color:#FF9900;
+}
+
+.credits.ucar {
+    bottom: 60px;
+    position: absolute;
+    right: 30px;
+}
+
+.credits.mlo {
+    bottom: 60px;
+    position: absolute;
+    left: 30px;
 }
