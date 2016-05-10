@@ -20,20 +20,26 @@ angular.module('edu.ucar.scied.controllers.co2', [])
         };
 
     })
-.controller('creditsCtrl', function ($scope){
-        $scope.displayHome = function(){
-            window.location.href="#/";
+    .controller('creditsCtrl', function ($scope) {
+        $scope.displayHome = function () {
+            window.location.href = "#/";
         };
-})
-.controller('graphCtrl', function ($scope) {
-        $scope.x_range_low = new Date($scope.date_init).getTime() / 1000;
+    })
+    .controller('graphCtrl', function ($scope) {
+        $scope.creditstitle = "Credits";
+        $scope.showCreditsModal = false;
 
-        $scope.bordercolor = 'CC0000';
-        $scope.fillcolor = '660000';
-    
-        $scope.displayCredits = function(){
-            window.location.href="#/credits";
+        // handle credits modal
+        $scope.toggleCreditsModal = function () {
+            $scope.showCreditsModal = !$scope.showCreditsModal;
         };
+
+        // credits close btn
+        $scope.closeModal = function () {
+            $scope.showCreditsModal = !$scope.showCreditsModal;
+        }
+
+
     })
     .controller('mlbCtrl', function ($scope) {
         $scope.file = "data/mlb.tsv";

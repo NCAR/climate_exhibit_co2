@@ -1,20 +1,26 @@
-angular.module("edu.ucar.scied.co2", ["edu.ucar.scied.controllers.co2", 
+angular.module("edu.ucar.scied.co2", ["edu.ucar.scied.controllers",
                                       "edu.ucar.scied.services",
-                           "edu.ucar.scied.directives.co2",
-                           "ngRoute"]).
-config(["$routeProvider", function($routeProvider) {
-  $routeProvider.
-	when("/", 
-         {
-            templateUrl: "templates/homepage.html", 
+                                      "edu.ucar.scied.directives",
+                                      "edu.ucar.scied.filters",
+                                      "edu.ucar.scied.directives.modal",
+                                      "edu.ucar.scied.controllers.co2",
+                                      "edu.ucar.scied.services",
+                                      "edu.ucar.scied.directives.co2",
+                                      "ngMaterial",
+                                      "ngRoute"]).
+
+
+config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.
+    when("/", {
+            templateUrl: "templates/homepage.html",
             controller: "homeCtrl"
-        }
-    )
-  .when("/credits", 
-         {
-            templateUrl: "templates/credits.html", 
+        })
+        .when("/credits", {
+            templateUrl: "templates/credits.html",
             controller: "creditsCtrl"
-        }
-    )
-    .otherwise({redirectTo: '/'});
+        })
+        .otherwise({
+            redirectTo: '/'
+        });
 }]);
