@@ -7,6 +7,10 @@ switch($_GET['datasource']){
         $file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_SPL_most_recent.lhr";
         $save_name = "spl";
         break;
+    case 'efs':
+        $file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_FEF_most_recent.lhr";
+        $save_name = "efs";
+        break;
     case 'nwr':
     default:
         $file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lhr";

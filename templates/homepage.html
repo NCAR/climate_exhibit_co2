@@ -1,9 +1,33 @@
-<div ng-controller="nwrCtrl" id="nwr">
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="nwr" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
+<!--//div ng-controller="mloCtrl" class="mlo">
+    <graph-generator></graph-generator>
 </div>
-<div ng-controller="splCtrl" id="spl">
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="spl" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
+<div ng-controller="nwrCtrl">
+    <graph-generator></graph-generator>
 </div>
-<div ng-controller="mloCtrl" id="mlo">
-    <lines-chart file="{{file}}" title="{{title}}" parentDiv="mlo" width="{{device_width}}" height="{{graph_height}}"></lines-chart>
+<div ng-controller="mlbCtrl">
+    <graph-generator></graph-generator>
+</div//-->
+<div ng-controller="graphCtrl">
+    <div class="btnCont">
+        <button ng-click="generateImageUrl('sixtyyear');" class="toggle" ng-class="{active: range == 'sixtyyear'}">60 years</button>
+        <button ng-click="generateImageUrl('tenyear');" class="toggle" ng-class="{active: range == 'tenyear'}">10 years</button>
+        <button ng-click="generateImageUrl('oneyear');" class="toggle" ng-class="{active: range == 'oneyear'}">1 year</button>
+        <button ng-click="generateImageUrl('onemonth');" class="toggle" ng-class="{active: range == 'onemonth'}">1 month</button>
+        <button ng-click="generateImageUrl('oneweek');" class="toggle" ng-class="{active: range == 'oneweek'}">1 week</button>
+        <button class="credits" ng-click="toggleCreditsModal()" class="toggle">Credits</button>
+    </div>
+    <graph-generator></graph-generator>
+    <modal visible="showCreditsModal" modaltitle="creditstitle" >
+        <div class="creditspage">
+            <img src="assets/sio_logo.png" alt="Scripps">
+            <p>Mauna Loa Data from Scripps CO<sub>2</sub> Program.</p>
+
+            <img src="assets/ncar.png" alt="NCAR">
+            <p>Niwot Ridge and Mesa Lab Data from NCAR.</p>
+
+            <p>Thanks to Stephen Walker (UCSD) and Britt Stephens (NCAR).</p>
+
+        </div>
+        <md-button class="md-raised md-cornered closeBtn" ng-click="closeModal();">Close</md-button>
+    </modal>
 </div>
