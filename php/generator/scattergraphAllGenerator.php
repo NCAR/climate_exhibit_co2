@@ -1,8 +1,8 @@
 <?php 
 if (php_sapi_name() != "cli") {
     // In cli-mode
-    echo "Cannot execute.";
-    exit();
+   // echo "Cannot execute.";
+    //exit();
 } 
 error_reporting(E_ALL);
 ini_set('memory_limit', '1024M'); // or you could use 1G
@@ -12,15 +12,12 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $baseurl = 'J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\';
     $path = 'J:\\Sharon\\xampp\\htdocs\\libraries\\php\\jpgraph\\src\\';
     require 'J:\\Sharon\\db\\credentials\\credentials.php';
-    
-    
     $imagedir = "J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\assets\\";
 } else {    
    $host = 'sql.ucar.edu';
-    
-        $baseurl = '/web/sparkapps/climate_exhibit_co2/';
-        $path = "/web/sparkapps/libraries/php/jpgraph/src/";
-        $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
+    $baseurl = '/web/sparkapps/climate_exhibit_co2/';
+    $path = "/web/sparkapps/libraries/php/jpgraph/src/";
+    $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
   
     require '/home/sclark/db/credentials/credentials.php';
     parse_str(implode('&', array_slice($argv, 1)), $_GET);
@@ -61,7 +58,7 @@ if(array_key_exists('left',$_GET) && !empty($_GET['left'])){
 if(array_key_exists('bottom',$_GET) && !empty($_GET['bottom'])){
     $margin_bottom = $_GET['bottom'];
 } else {
-    $margin_bottom = 0;
+    $margin_bottom = 100;
 }
 // margin right
 if(array_key_exists('right',$_GET) && !empty($_GET['right'])){
@@ -213,8 +210,7 @@ $graph->xaxis->SetLabelAngle(90);
 // Setup Y-axis title
 $graph->yaxis->scale->SetAutoMax($yMax); 
 $graph->yaxis->scale->SetAutoMin($yMin); 
-$graph->yaxis->SetFont(FF_FONT2,FS_NORMAL,48);
-
+$graph->yaxis->SetFont(FF_FONT2,FS_NORMAL,12);
 
 // for mesa lab data
 readData($mysqli,'mlb',$a_range, $xdata2,$ydata2);
@@ -227,10 +223,8 @@ $sp2->mark->SetColor($bordercolor2);
 $sp2->mark->SetWidth(5);
 $graph->Add($sp2);
 
-
 // for nwr data
 readData($mysqli,'nwr',$a_range, $xdata1,$ydata1);
-
 $fillcolor1 = '#0000FF';
 $bordercolor1 = '#000066';
 $sp1 = new ScatterPlot($ydata1,$xdata1);
@@ -241,7 +235,6 @@ $sp1->mark->SetWidth(5);
 $graph->Add($sp1);
 
 // for mlo data
-
 readData($mysqli,'mlo',$a_range, $xdata0,$ydata0);
 $mysqli->close();
 $fillcolor0 = "#CC0000";
@@ -253,16 +246,16 @@ $sp0->mark->SetColor($bordercolor0);
 $sp0->mark->SetWidth(5); 
 $graph->Add($sp0);
 
-
-$sp0->SetLegend("Mauna Loa");
+/*$sp0->SetLegend("Mauna Loa");
 $sp1->SetLegend("Niwot Ridge");
 $sp2->SetLegend("Mesa Lab");
 $graph->legend->SetFrameWeight(1);
-$graph->legend->SetFont(FF_FONT2,FS_NORMAL,96);
+$graph->legend->SetFont(FF_FONT2,FS_NORMAL,15);
+$graph->legend->SetMarkAbsSize(10);
 $graph->legend->SetColumns(3);
 $graph->legend->SetColor('#4E4E4E','#00A78A');
 $graph->legend->SetAbsPos($width/2-100,$height-100,'right','bottom');
-
+*/
 
 if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
     $myscale = $xdata1;
@@ -272,9 +265,8 @@ if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
 list($tickPos,$minTickPos) = $dateUtils->getTicks($myscale,$tickCond);
 $graph->xaxis->SetPos('min');
 $graph->xaxis->SetMajTickPositions($tickPos);
-$graph->xaxis->scale->SetTimeAlign( MINADJ_1 );
-$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,48);
-
+$graph->xaxis->scale->SetTimeAlign( MINADJ_1,MINADJ_1);
+$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,12);
 
 unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);
@@ -296,6 +288,5 @@ if (!copy($temp_filename, $filename)) {
     echo "failed to copy $temp_filename...\n";
 } else {
     echo "copying ".$temp_filename." to ".$filename."\n";
-    
 }
 ?>

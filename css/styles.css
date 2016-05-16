@@ -14,14 +14,14 @@ body {
     -o-transform: rotate(-90deg);
     /* Internet Explorer */
     filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3);
-    left: -50px;
+    left: -150px;
     position: absolute;
     font-weight:normal;
     top:400px;
 }
 .axis_x,
 .axis_y {
-    font-size: 1em;
+    font-size: 1.75em;
     color:#333;
 }
 .title {
@@ -37,6 +37,10 @@ body {
 .title,
 .axis_x {
     text-align: center;
+}
+.legend_cont {
+    text-align:center;
+    width:1400px;
 }
 .btnCont {
     margin-top: 20px;
