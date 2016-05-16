@@ -9,9 +9,9 @@ if (php_sapi_name() != "cli") {
     } else {    
         require '/home/sclark/db/credentials/credentials.php';
     }
-$sitecode = 'nwr';
+$sitecode = 'mlb';
 $max_value_amt = 50;
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lhr"; 
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lhr"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -28,7 +28,7 @@ while(!feof($f))
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
         if(isset($a_data[8])){
-            $co2_value = trim($a_data[10]);
+            $co2_value = trim($a_data[8]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
                 $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
@@ -74,6 +74,8 @@ if ($mysqli->connect_error) {
     exit;
 }
 
+
+
 foreach($a_last_lines as $key=>$value_new){
     // for each value check if it exists in db
     $myquery1 = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
@@ -110,8 +112,10 @@ foreach($a_last_lines as $key=>$value_new){
     }
 }
 
-// close db
+
 $mysqli->close();
+// close db
+
 
 unset($a_last_lines);
 ?>

@@ -26,7 +26,7 @@ angular.module('edu.ucar.scied.controllers.co2', [])
         };
     })
     .controller('graphCtrl', function ($scope) {
-        $scope.creditstitle = "Credits";
+        $scope.creditstitle = "Credits and Acknowledgements";
         $scope.showCreditsModal = false;
 
         // handle credits modal

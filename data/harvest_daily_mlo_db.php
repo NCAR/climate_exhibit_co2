@@ -1,4 +1,9 @@
 <?php
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         require 'J:\\Sharon\\db\\credentials\\credentials.php';
     } else {    

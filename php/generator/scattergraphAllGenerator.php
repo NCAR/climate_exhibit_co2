@@ -1,4 +1,9 @@
 <?php 
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
 error_reporting(E_ALL);
 ini_set('memory_limit', '1024M'); // or you could use 1G
 // vars
@@ -10,18 +15,14 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     
     $imagedir = "J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\assets\\";
 } else {    
-    $host = $_SERVER['SERVER_NAME'];
-    if($host == 'test.apps.spark.ucar.edu'){
-        $baseurl = '/test/sparkapps/climate_exhibit_co2/';
-        $path = "/test/sparkapps/libraries/php/jpgraph/src/";
-        
-        $imagedir = "/test/sparkapps/climate_exhibit_co2/assets/";
-    } else {
+   $host = 'sql.ucar.edu';
+    
         $baseurl = '/web/sparkapps/climate_exhibit_co2/';
         $path = "/web/sparkapps/libraries/php/jpgraph/src/";
         $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
-    }
+  
     require '/home/sclark/db/credentials/credentials.php';
+    parse_str(implode('&', array_slice($argv, 1)), $_GET);
 }
 
 // require
@@ -72,7 +73,7 @@ if(array_key_exists('right',$_GET) && !empty($_GET['right'])){
 if(array_key_exists('range',$_GET) && !empty($_GET['range'])){
     $range = $_GET['range'];
 } else {
-    $range = "tenyear";
+    $range = "oneweek";
 }
 
 $imagename = $range;
@@ -113,7 +114,7 @@ switch($range){
         $a_range['x_low'] = strtotime("-1 week");
         $a_range['x_high'] = time();
         $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->SetLabelFormatString('M-d-Y',true);
+        $graph->xaxis->SetLabelFormatString('M-d',true);
         $graph->xaxis->scale->ticks->Set(60*60*24);
         break;
     case "oneday":        

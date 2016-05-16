@@ -1,4 +1,9 @@
 <?php 
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
 // vars
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $baseurl = 'J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\';
