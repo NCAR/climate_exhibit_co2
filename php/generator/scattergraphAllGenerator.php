@@ -1,8 +1,8 @@
 <?php 
 if (php_sapi_name() != "cli") {
     // In cli-mode
-    //echo "Cannot execute.";
-    //exit();
+    echo "Cannot execute.";
+    exit();
 } 
 error_reporting(E_ALL);
 ini_set('memory_limit', '1024M'); // or you could use 1G
