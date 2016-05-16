@@ -20,21 +20,26 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
   
     require '/home/sclark/db/credentials/credentials.php';
-    parse_str(implode('&', array_slice($argv, 1)), $_GET);
 }
 
+if(isset($argv)){
+        parse_str(implode('&', array_slice($argv, 1)), $_GET);
+}
 // require
 require_once ($path.'jpgraph.php');
 require_once ($path.'jpgraph_scatter.php');
 require_once ($path.'jpgraph_date.php');
 require_once ($path.'jpgraph_utils.inc.php');
 
+
+
+
 // set up params
 // height
 if(array_key_exists('height',$_GET) && !empty($_GET['height'])){
     $height = $_GET['height'];
 } else {
-    $height = 1000;
+    $height = 850;
 }
 // width
 if(array_key_exists('width',$_GET) && !empty($_GET['width'])){
