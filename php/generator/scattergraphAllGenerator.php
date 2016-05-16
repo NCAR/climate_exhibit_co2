@@ -1,11 +1,12 @@
 <?php 
 if (php_sapi_name() != "cli") {
     // In cli-mode
-    echo "Cannot execute.";
-    exit();
+    //echo "Cannot execute.";
+    //exit();
 } 
 error_reporting(E_ALL);
 ini_set('memory_limit', '1024M'); // or you could use 1G
+$tempdir = 'temp/';
 // vars
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $baseurl = 'J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\';
@@ -85,8 +86,8 @@ $graph->SetMargin($margin_left,$margin_right,$margin_top,$margin_bottom);
 $graph->SetScale('datint');
 
 switch($range){
-    case "sixtyyear":
-        $a_range['x_low'] = strtotime("-60 year");
+    case "all":
+        $a_range['x_low'] = strtotime("January 1, 1950");
         $a_range['x_high'] = time();
         $tickCond = DSUTILS_YEAR1;
         $graph->xaxis->SetLabelFormatString('Y',true);
@@ -107,7 +108,7 @@ switch($range){
         $a_range['x_low'] = strtotime("-1 month");
         $a_range['x_high'] = time();
         $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->SetLabelFormatString('M-d-Y',true);
+        $graph->xaxis->SetLabelFormatString('M-d',true);
         $graph->xaxis->scale->ticks->Set(60*60*24);
         break;
     case "oneweek":        
@@ -278,12 +279,20 @@ $graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,48);
 unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);
 unset($xdata0,$ydata0);
+
 $filename = $imagedir.$imagename.'.jpg';
+$temp_filename = $imagedir.$tempdir.$imagename.'.jpg';
 
 // before rendering, delete the existing, if it exists
-unlink($filename);
-echo "writing to ".$filename;
+if(file_exists($temp_filename)){
+    unlink($temp_filename);
+}
+echo "writing to ".$temp_filename;
 // render graph
-$graph->Stroke($filename);
+$graph->Stroke($temp_filename);
 
+// after create graph copy to final location
+if (!copy($temp_filename, $filename)) {
+    echo "failed to copy $temp_filename...\n";
+}
 ?>
