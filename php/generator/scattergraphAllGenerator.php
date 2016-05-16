@@ -287,12 +287,15 @@ $temp_filename = $imagedir.$tempdir.$imagename.'.jpg';
 if(file_exists($temp_filename)){
     unlink($temp_filename);
 }
-echo "writing to ".$temp_filename;
+echo "writing to ".$temp_filename."\n";
 // render graph
 $graph->Stroke($temp_filename);
 
 // after create graph copy to final location
 if (!copy($temp_filename, $filename)) {
     echo "failed to copy $temp_filename...\n";
+} else {
+    echo "copying ".$temp_filename." to ".$filename."\n";
+    
 }
 ?>
