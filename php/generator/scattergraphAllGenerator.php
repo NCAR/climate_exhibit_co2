@@ -1,10 +1,11 @@
 <?php 
 if (php_sapi_name() != "cli") {
     // In cli-mode
-    echo "Cannot execute.";
-    exit();
+    //echo "Cannot execute.";
+    //exit();
 } 
 error_reporting(E_ALL);
+set_time_limit(0);
 ini_set('memory_limit', '1024M'); // or you could use 1G
 $tempdir = 'temp/';
 // vars
@@ -28,11 +29,10 @@ if(isset($argv)){
 // require
 require_once ($path.'jpgraph.php');
 require_once ($path.'jpgraph_scatter.php');
+require_once ($path.'jpgraph_line.php');
 require_once ($path.'jpgraph_date.php');
 require_once ($path.'jpgraph_utils.inc.php');
-
-
-
+date_default_timezone_set ("America/Denver");
 
 // set up params
 // height
@@ -86,46 +86,70 @@ $graph->img->SetImgFormat('jpeg');
 $graph->SetMargin($margin_left,$margin_right,$margin_top,$margin_bottom);
 // Specify what scale we want to use,
 $graph->SetScale('datint');
-
+$graph->SetTickDensity(TICKD_VERYSPARSE);
 switch($range){
     case "all":
         $a_range['x_low'] = strtotime("January 1, 1950");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_YEAR1;
-        $graph->xaxis->SetLabelFormatString('Y',true);
+       //$tickCond = DSUTILS_YEAR1;
+        $graph->xaxis->scale->SetDateFormat('Y');
+        // Set the labels every 5 year (i.e. 157680000seconds) and minor ticks every year
+        $majortick = 157680000;
+        $minortick = 31536000;
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "tenyear":
-        $a_range['x_low'] = strtotime("-10 year");
+        $a_range['x_low'] = strtotime("today midnight -10 year");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_YEAR1;
-        $graph->xaxis->SetLabelFormatString('Y',true);
+       // $tickCond = DSUTILS_YEAR1;
+        $graph->xaxis->scale->SetDateFormat('Y');
+        // Set the labels every year (i.e. 31536000seconds) and minor ticks every mmonth
+        $majortick = 31536000;
+        $minortick = 2628000;
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;    
     case "oneyear":
-        $a_range['x_low'] = strtotime("-1 year");
+        $a_range['x_low'] = strtotime("today midnight -1 year");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_MONTH1;
-        $graph->xaxis->SetLabelFormatString('M-Y',true);
+       // $tickCond = DSUTILS_MONTH1;
+        $graph->xaxis->scale->SetDateFormat('M-Y');
+        // Set the labels every month (i.e. 2628000seconds) and minor ticks every day
+        $majortick = 2628000;
+        $minortick = 86400;
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "onemonth":
-        $a_range['x_low'] = strtotime("-1 month");
+        $a_range['x_low'] = strtotime("today midnight -1 month");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->SetLabelFormatString('M-d',true);
-        $graph->xaxis->scale->ticks->Set(60*60*24);
+       // $tickCond = DSUTILS_DAY1;
+        $graph->xaxis->scale->SetDateFormat('M-d');
+        //$graph->xaxis->scale->ticks->Set(60*60*24);
+        // Set the labels every day (i.e. 86400 seconds) and minor ticks every hour
+        $majortick = 86400;
+        $minortick = 3600;
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "oneweek":        
-        $a_range['x_low'] = strtotime("-1 week");
+        $a_range['x_low'] = strtotime("today midnight -1 week");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->SetLabelFormatString('M-d',true);
-        $graph->xaxis->scale->ticks->Set(60*60*24);
+       // $tickCond = DSUTILS_DAY1;
+        $graph->xaxis->scale->SetDateFormat('M-d');
+        //$graph->xaxis->scale->ticks->Set(60*60*24);
+        // Set the labels every day (i.e. 3600seconds) and minor ticks every hour
+        $majortick = 86400;
+        $minortick = 3600;
+        
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "oneday":        
-        $a_range['x_low'] = strtotime("-1 week");
+        $a_range['x_low'] = strtotime("today midnight -1 day");
         $a_range['x_high'] = time();
-        $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->SetLabelFormatString('M-d H:i',true);
-        $graph->xaxis->scale->ticks->Set(60*5);
+       // $tickCond = DSUTILS_DAY1;
+        $graph->xaxis->scale->SetDateFormat('H:i');
+        $majortick = 3600;
+        $minortick = 60;
+        
+        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;    
 }
 
@@ -160,8 +184,19 @@ function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData){
             }
            
             if($f_add == true){
-                $aXData[] = $data['timestamp'];
-                $aYData[] = $data['value'];
+                
+                if($sitecode == 'mlo'){
+                    $aXData[] = $data['timestamp'] - (60*60*6);
+                    $aYData[] = $data['value'];
+                    
+                    
+                    $aXData[] = $data['timestamp'] + (60*60*6);
+                    $aYData[] = $data['value'];
+                    
+                } else {
+                    $aXData[] = $data['timestamp'];
+                    $aYData[] = $data['value'];
+                }
             }
         }    
     $query->free(); 
@@ -170,6 +205,7 @@ function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData){
 }
 $xdata0 = $xdata1 = $xdata2 = array();
 $ydata0 = $ydata1 = $ydata2 = array();
+
 
 $mysqli = new mysqli($host, $username, $password, $database);
 if ($mysqli->connect_error) {
@@ -209,8 +245,7 @@ if($numrows == 1){
     $query->free();
  }
  
-// Setup titles and X-axis labels
-$graph->xaxis->SetLabelAngle(90);
+
 
 // Setup Y-axis title
 $graph->yaxis->scale->SetAutoMax($yMax); 
@@ -249,7 +284,20 @@ $sp0->mark->SetType(MARK_FILLEDCIRCLE);
 $sp0->mark->SetFillColor($fillcolor0);
 $sp0->mark->SetColor($bordercolor0);
 $sp0->mark->SetWidth(5); 
+$sp0->link->Show();
+$sp0->link->SetWeight(2);
+$sp0->link->SetColor('red@0.7');
 $graph->Add($sp0);
+
+
+// Create the two linear plot
+$lineplot=new LinePlot($ydata0);
+$lineplot->SetStepStyle();
+// Set the colors for the plots 
+$lineplot->SetColor("blue");
+$lineplot->SetWeight(2);
+// Add the plot to the graph
+$graph->Add($lineplot);
 
 /*$sp0->SetLegend("Mauna Loa");
 $sp1->SetLegend("Niwot Ridge");
@@ -267,11 +315,21 @@ if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
 } else {
     $myscale = $xdata0;
 }
-list($tickPos,$minTickPos) = $dateUtils->getTicks($myscale,$tickCond);
+//$graph ->xaxis->scale-> SetDateAlign( DAYADJ_1);
+//$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,12);
+// Make sure that the X-axis is always at the bottom of the scale
+// (By default the X-axis is alwys positioned at Y=0 so if the scale
+// doesn't happen to include 0 the axis will not be shown)
+// Setup titles and X-axis labels
+$graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos('min');
-$graph->xaxis->SetMajTickPositions($tickPos);
-$graph->xaxis->scale->SetTimeAlign( MINADJ_1,MINADJ_1);
-$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,12);
+ 
+// Now set the tic positions
+//list($tickPositions,$minTickPositions) = $dateUtils->GetTicks($xdata0);
+//$graph->xaxis->SetTickPositions($tickPositions,$minTickPositions);
+
+// Add a X-grid
+//$graph->xgrid->Show();
 
 unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);

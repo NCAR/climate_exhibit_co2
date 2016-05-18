@@ -9,9 +9,11 @@ if (php_sapi_name() != "cli") {
     } else {    
         require '/home/sclark/db/credentials/credentials.php';
     }
+date_default_timezone_set("Etc/GMT");
 $sitecode = 'mlb';
-$max_value_amt = 50;
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lhr"; 
+$max_value_amt = 300;
+//$max_value_amt = 5000;
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -27,16 +29,20 @@ while(!feof($f))
         // format the value
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
-        if(isset($a_data[8])){
-            $co2_value = trim($a_data[8]);
+        if(isset($a_data[9])){
+            $co2_value = trim($a_data[9]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
+                $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
                 $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
                 $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
                 $hour = str_pad($a_data[4], 2, '0', STR_PAD_LEFT);
-                $new_date = $a_data[1].'-'.$month.'-'.$day.'T'.$hour.':00:00';
+                $min = str_pad($a_data[5], 2, '0', STR_PAD_LEFT);
+                
+                $new_date = $year.'-'.$month.'-'.$day.'T'.$hour.':'.$min.':00';
 
                 $date = new DateTime($new_date);
+                $date->setTimeZone(new DateTimeZone("Etc/GMT"));
                 $a_new_data[] = $date->getTimestamp();
                 $a_new_data[] = $co2_value;
                     
@@ -93,9 +99,9 @@ foreach($a_last_lines as $key=>$value_new){
             echo $mysqli->error;
             exit;
         }
-        echo "Added ".date('Y-m-d H:m:i',$value_new[0])." - $value_new[1] for $sitecode to db.\r\n";
+        echo "Added ".date('Y-m-d H:i:s',$value_new[0])." - $value_new[1] for $sitecode to db.\r\n";
     } else {
-        echo "Value already exists on ".date('Y-m-d H:m:i',$value_new[0])." for $sitecode.\r\n";
+        echo "Value already exists on ".date('Y-m-d H:i:s',$value_new[0])." for $sitecode.\r\n";
         $data = $query1->fetch_assoc();
         if($value_new[1] != $data['co2_value']){
             
@@ -107,7 +113,7 @@ foreach($a_last_lines as $key=>$value_new){
                 exit;
             }
             
-            echo "Updated ".date('Y-m-d H:m:i',$value_new[0])." - $value_new[1] for $sitecode to db.\r\n";
+            echo "Updated ".date('Y-m-d H:i:s',$value_new[0])." - $value_new[1] for $sitecode to db.\r\n";
         } 
     }
 }
