@@ -4,9 +4,8 @@ if (php_sapi_name() != "cli") {
     echo "Cannot execute.";
     exit();
 } 
-
-$max_value_amt = 50;
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lhr"; 
+$max_value_amt = 500;
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lhr"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -23,7 +22,7 @@ while(!feof($f))
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
         if(isset($a_data[8])){
-            $co2_value = trim($a_data[10]);
+            $co2_value = trim($a_data[8]);
             if($co2_value != 'NaN' && $co2_value > 0){       
                 $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
                 $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
@@ -48,7 +47,7 @@ while(!feof($f))
 fclose($f); 
 
 // save to local data if valid
-$file = "/web/sparkapps/climate_exhibit_co2/data/nwr.tsv"; 
+$file = "/web/sparkapps/climate_exhibit_co2/data/mlb.tsv"; 
 // get our data for comparison
 $f = fopen($file, 'r');
 $a_data_tail = array();
