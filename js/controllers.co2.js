@@ -21,16 +21,20 @@
         $scope.date_init = "01/01/2005";
         $scope.range = "tenyear";
 
-        $scope.generateImageUrl = function (range) {
+        $scope.generateImageUrl = generateImageUrlFunc;
+
+        function generateImageUrlFunc(range) {
             $scope.range = range;
-        };
+        }
 
     }
 
     function creditsCtrl($scope) {
-        $scope.displayHome = function () {
+        $scope.displayHome = displayHomeFunc;
+
+        function displayHomeFunc() {
             window.location.href = "#/";
-        };
+        }
     }
 
     function graphCtrl($scope) {
@@ -38,12 +42,16 @@
         $scope.showCreditsModal = false;
 
         // handle credits modal
-        $scope.toggleCreditsModal = function () {
-            $scope.showCreditsModal = !$scope.showCreditsModal;
-        };
+        $scope.toggleCreditsModal = toggleCreditsModalFunc;
 
         // credits close btn
-        $scope.closeModal = function () {
+        $scope.closeModal = closeModalFunc;
+
+        function closeModalFunc() {
+            $scope.showCreditsModal = !$scope.showCreditsModal;
+        }
+
+        function toggleCreditsModalFunc() {
             $scope.showCreditsModal = !$scope.showCreditsModal;
         }
     }
