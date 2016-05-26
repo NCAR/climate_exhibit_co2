@@ -2,7 +2,6 @@
     'use strict';
     angular.module("edu.ucar.scied.co2", ["edu.ucar.scied.controllers",
                                       "edu.ucar.scied.services",
-                                      "edu.ucar.scied.directives",
                                       "edu.ucar.scied.filters",
                                       "edu.ucar.scied.directives.modal",
                                       "edu.ucar.scied.controllers.co2",
