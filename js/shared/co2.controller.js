@@ -1,9 +1,10 @@
 (function () {
     'use strict';
-    angular.module('edu.ucar.scied.controllers.co2', [])
+    angular.module('edu.ucar.scied.co2.controller', [])
         .controller('homeCtrl', homeCtrl)
         .controller('graphCtrl', graphCtrl);
 
+    homeCtrl.$inject = ['$scope'];
     function homeCtrl($scope) {
         // ipad pro resolution is 2048x2732, so max height of each, with nav is 682
         $scope.axis_y_label = "Carbon Dioxide (parts per million)";
@@ -16,6 +17,7 @@
         }
 
     }
+    graphCtrl.$inject = ['$scope'];
     function graphCtrl($scope) {
         $scope.creditstitle = "Credits and Acknowledgements";
         $scope.showCreditsModal = false;

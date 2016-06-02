@@ -1,6 +1,6 @@
 (function () {
     'use strict';
-    angular.module('edu.ucar.scied.directives.co2', [])
+    angular.module('edu.ucar.scied.chart_image.directive', [])
         .directive('graphGenerator', graphGenerator);
 
     function graphGenerator() {
