@@ -9,9 +9,11 @@ if (php_sapi_name() != "cli") {
     } else {    
         require '/home/sclark/db/credentials/credentials.php';
     }
+date_default_timezone_set("Etc/GMT");
 $sitecode = 'nwr';
 $max_value_amt = 300;
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lin"; 
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lme"; 
+//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -27,21 +29,18 @@ while(!feof($f))
         // format the value
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
-        if(isset($a_data[10]) || isset($a_data[11])){
-            $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
-            $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
-            $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
-            $hour = str_pad($a_data[4], 2, '0', STR_PAD_LEFT);
-            $min = str_pad($a_data[5], 2, '0', STR_PAD_LEFT);
-            if($year == '2005' && $month <= '9' && $day <= '10' && $hour <= '21' && $min <= '45'){
-                $co2_value = trim($a_data[10]);  
-            } else {
-                $co2_value = trim($a_data[11]);
-            }
-            
+        if(isset($a_data[8])){
+            $co2_value = trim($a_data[8]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
-                $new_date = $year.'-'.$month.'-'.$day.'T'.$hour.':'.$min.':00';
+                $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
+                $month = str_pad($a_data[2], 2, '0', STR_PAD_LEFT);
+                $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
+                $hour = str_pad($a_data[4], 2, '0', STR_PAD_LEFT);
+                $min = str_pad($a_data[5], 2, '0', STR_PAD_LEFT);
+                $sec = str_pad($a_data[6], 2, '0', STR_PAD_LEFT);
+                
+                $new_date = $year.'-'.$month.'-'.$day.'T'.$hour.':'.$min.':'.$sec;
 
                 $date = new DateTime($new_date);
                 $date->setTimeZone(new DateTimeZone("Etc/GMT"));
@@ -50,7 +49,7 @@ while(!feof($f))
                     
                 array_push($a_last_lines, $a_new_data);
                 if (count($a_last_lines)>$max_value_amt){
-                    array_shift($a_last_lines);
+                   array_shift($a_last_lines);
                 }
             }
         } else {

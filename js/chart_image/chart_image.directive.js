@@ -8,7 +8,7 @@
             restrict: 'E',
             scope: true,
             replace: false,
-            templateUrl: "templates/chart.html",
+            templateUrl: "js/chart_image/chart.html",
         };
         return directiveDefinitionObject;
 

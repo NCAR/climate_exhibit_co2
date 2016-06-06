@@ -32,7 +32,7 @@ require_once ($path.'jpgraph_scatter.php');
 require_once ($path.'jpgraph_line.php');
 require_once ($path.'jpgraph_date.php');
 require_once ($path.'jpgraph_utils.inc.php');
-date_default_timezone_set ("America/Denver");
+date_default_timezone_set ("Etc/GMT");
 
 // set up params
 // height
@@ -194,6 +194,7 @@ function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData){
                     $aYData[] = $data['value'];
                     
                 } else {*/
+                // convert to denver time
                     $aXData[] = $data['timestamp'];
                     $aYData[] = $data['value'];
                // }

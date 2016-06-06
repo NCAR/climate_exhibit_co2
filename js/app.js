@@ -14,7 +14,7 @@
     config(["$routeProvider", function ($routeProvider) {
         $routeProvider.
         when("/", {
-                templateUrl: "templates/homepage.html",
+                templateUrl: "js/shared/homepage.html",
                 controller: "homeCtrl"
             })
             .otherwise({
