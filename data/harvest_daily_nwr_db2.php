@@ -1,7 +1,7 @@
 <?php
 /**
-*   This harvests NWR (Niwot Ridge) data that are the 15 minute data intervals
-*   from db: climate_co2_data
+*   This harvests NWR (Niwot Ridge) data that are the most granular data intervals (approx every 3 mins)
+*   from db: climate_co2_data2
 **/
 if (php_sapi_name() != "cli") {
     // In cli-mode
@@ -15,7 +15,10 @@ if (php_sapi_name() != "cli") {
     }
 date_default_timezone_set("Etc/GMT");
 $sitecode = 'nwr';
-$max_value_amt = 300;
+// ~480 per day
+// ~3360 per week
+// ~ 175200 per year
+$max_value_amt = 876000;
 $file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lme"; 
 //$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
@@ -53,6 +56,7 @@ while(!feof($f))
                     
                 array_push($a_last_lines, $a_new_data);
                 if (count($a_last_lines)>$max_value_amt){
+                    echo 'removing unneeded values'."\n";
                    array_shift($a_last_lines);
                 }
             }
@@ -87,7 +91,7 @@ if ($mysqli->connect_error) {
 
 foreach($a_last_lines as $key=>$value_new){
     // for each value check if it exists in db
-    $myquery1 = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
+    $myquery1 = "SELECT * FROM climate_co2_data2 WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
     $query1 = $mysqli->query($myquery1);
     if ( ! $query1 ) {
         echo $mysqli->error;
@@ -96,7 +100,7 @@ foreach($a_last_lines as $key=>$value_new){
     $numrows1 = $query1->num_rows;
     // if value does not exit in db then add it
     if($numrows1 == 0){
-        $myquery2 = "INSERT INTO climate_co2_data(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$value_new[1]', '$value_new[0]')";
+        $myquery2 = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$value_new[1]', '$value_new[0]')";
         $query2 = $mysqli->query($myquery2);
         if ( ! $query2 ) {
             echo $mysqli->error;
@@ -108,7 +112,7 @@ foreach($a_last_lines as $key=>$value_new){
         $data = $query1->fetch_assoc();
         if($value_new[1] != $data['co2_value']){
             
-            $myquery3 = "UPDATE climate_co2_data SET co2_value='$value_new[1]' WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
+            $myquery3 = "UPDATE climate_co2_data2 SET co2_value='$value_new[1]' WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
             
             $query3 = $mysqli->query($myquery3);
              if ( ! $query3 ) {

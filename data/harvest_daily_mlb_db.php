@@ -1,4 +1,8 @@
 <?php
+/**
+*   This harvests MLB (Mesa Lab) data that are the 15 minute data intervals
+*   from db: climate_co2_data
+**/
 if (php_sapi_name() != "cli") {
     // In cli-mode
     echo "Cannot execute.";

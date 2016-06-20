@@ -1,7 +1,7 @@
 <?php 
 /**
-*   This creates images that are based off the most 15 minute data intervals
-*   from db: climate_co2_data
+*   This creates images that are based off the most granular data intervals (approx every 3 mins)
+*   from db: climate_co2_data2
 **/
 if (php_sapi_name() != "cli") {
     // In cli-mode
@@ -163,7 +163,7 @@ switch($range){
 $dateUtils = new DateScaleUtils();
 
 function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData,&$a_numrows){
-    $myquery = "SELECT co2_value as value, timestamp_co2_recorded as timestamp FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded >= ".$a_range['x_low']." AND timestamp_co2_recorded <= ".$a_range['x_high']." AND active='1'";
+    $myquery = "SELECT co2_value as value, timestamp_co2_recorded as timestamp FROM climate_co2_data2 WHERE sitecode='$sitecode' AND timestamp_co2_recorded >= ".$a_range['x_low']." AND timestamp_co2_recorded <= ".$a_range['x_high']." AND active='1'";
     
     $query = $mysqli->query($myquery);
     if ( ! $query ) {
@@ -242,7 +242,7 @@ if ($mysqli->connect_error) {
 // get max and min values over all
 $yMax = 450;
 $yMin = 0;
-$myquery = "SELECT MIN(co2_value) as ymin, MAX(co2_value) as ymax FROM climate_co2_data WHERE timestamp_co2_recorded >= ".$a_range['x_low']." AND timestamp_co2_recorded <= ".$a_range['x_high']." AND active='1'";
+$myquery = "SELECT MIN(co2_value) as ymin, MAX(co2_value) as ymax FROM climate_co2_data2 WHERE timestamp_co2_recorded >= ".$a_range['x_low']." AND timestamp_co2_recorded <= ".$a_range['x_high']." AND active='1'";
 $query = $mysqli->query($myquery);
 if ( ! $query ) {
     echo $mysqli->errno;

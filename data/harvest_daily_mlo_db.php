@@ -1,4 +1,8 @@
 <?php
+/**
+*   This harvests MLO (Mauna Loa) data
+*   from db: climate_co2_data and climate_co2_data2
+**/
 if (php_sapi_name() != "cli") {
     // In cli-mode
     echo "Cannot execute.";
@@ -46,6 +50,7 @@ if(!empty($output) && !preg_match("/NaN/",$output)){
     $connection = mysql_select_db($database, $server);
 
     // for each value check if it exists in db
+    // for 15 minute interval db for mlb and nwr
     $myquery = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$a_new_data[0]'";
     $query = mysql_query($myquery);
     $numrows = mysql_num_rows($query);
@@ -62,7 +67,28 @@ if(!empty($output) && !preg_match("/NaN/",$output)){
         echo mysql_error();
         die;
     }
-
+    
+    
+    // // for each value check if it exists in db
+    // for 3 minute interval db for mlb and nwr
+    $myquery = "SELECT * FROM climate_co2_data2 WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$a_new_data[0]'";
+    $query = mysql_query($myquery);
+    $numrows = mysql_num_rows($query);
+    
+    // if value does not exit in db then add it
+    if($numrows == 0){
+        $myquery = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$a_new_data[1]', '$a_new_data[0]')";
+        $query = mysql_query($myquery);        
+        echo "Added ".date('Y-m-d H:m:i',$a_new_data[0])." - $a_new_data[1] for $sitecode to db.\r\n";
+    } else {
+        echo "Value already exists on ".date('Y-m-d H:m:i',$a_new_data[0])." for $sitecode.\r\n";
+    }
+    if ( ! $query ) {
+        echo mysql_error();
+        die;
+    }
+    
+   
     // close db
     mysql_close($server);
     
