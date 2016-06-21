@@ -29,44 +29,6 @@ def usage():
 # ~3360 per week
 # ~ 175200 per year
 
-# function to insert or update values    
-def db_transaction(transaction_type, sitecode, value, timestamp, old_value):
-    time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
-    if (transaction_type == 'insert'):
-        sql = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('%s','%s','%i')" % (sitecode, value, timestamp)
-        message_success = "Added %s - %s for %s to db.\r\n" % (time_formatted, value, sitecode)
-        message_failure = "Could not commit %s - %s for %s to db.\r\n" % (time_formatted, value, sitecode)       
-    elif (transaction_type == 'update'):
-        sql = "UPDATE climate_co2_data2 SET co2_value='%s' WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (value, sitecode, timestamp)
-        message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, value, sitecode, old_value)
-        message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, value, sitecode, old_value)
-    else:
-        print 'Must choose either insert or update'
-        sys.exit(2)
-        
-    try:
-        # Execute the SQL command
-        cursor.execute(sql)
-        # Commit your changes in the database
-        db.commit()
-        print message_success
-    except:
-        # Rollback in case there is any error
-        db.rollback()
-        print message_failure
-
-# function to format timestamp
-def generate_timestamp(parts):
-    year = parts[1]
-    month = parts[2].zfill(2)
-    day = parts[3].zfill(2)
-    hour = parts[4].zfill(2)
-    minute = parts[5].zfill(2)
-    sec = parts[6].zfill(2)
-    date_text = year+'-'+month+'-'+day+'T'+hour+':'+minute+':'+sec;
-    date = datetime.datetime.strptime(date_text, "%Y-%m-%dT%H:%M:%S")
-    return calendar.timegm(date.utctimetuple())
-
 # funtion to retrieve list of data
 def retrieve_data(filename):
     # open external file to retrieve data
@@ -123,12 +85,22 @@ def main():
 
         for line in lastlines:
             # if doing full range of data, ignore the first 29 lines which are just text file comments
+            message_failure = ''
+            message_success = ''
             if (daterange != '' or counter > 29):
                 
                 parts = line.split()
 
                 if (len(parts) > 0):
-                    timestamp = generate_timestamp(parts)
+                    year = parts[1]
+                    month = parts[2].zfill(2)
+                    day = parts[3].zfill(2)
+                    hour = parts[4].zfill(2)
+                    minute = parts[5].zfill(2)
+                    sec = parts[6].zfill(2)
+                    date_text = year+'-'+month+'-'+day+'T'+hour+':'+minute+':'+sec;
+                    date = datetime.datetime.strptime(date_text, "%Y-%m-%dT%H:%M:%S")
+                    timestamp = calendar.timegm(date.utctimetuple())
                     co2_value = parts[8]
 
                     # see if already exists in db
@@ -137,8 +109,12 @@ def main():
                     cursor.execute(sql)
                     # ensure no results before insert
                     numrows = cursor.rowcount
+                    time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                     if (numrows == 0):
-                        db_transaction('insert', sitecode, str(co2_value), timestamp, 0)
+                        #db_transaction('insert', sitecode, str(co2_value), timestamp, 0)
+                        sql = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('%s','%s','%i')" % (sitecode, co2_value, timestamp)
+                        message_success = "Added %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)
+                        message_failure = "Could not commit %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)      
                     else:
                         print "Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode)
                         # if more than 1 row - report as error
@@ -148,7 +124,21 @@ def main():
                             #check if values are different. If so, update
                             data = cursor.fetchone()
                             if (str(data[2]) != str(co2_value)):
-                                db_transaction('update', sitecode, str(co2_value), timestamp, str(data[2]))
+                                #db_transaction('update', sitecode, str(co2_value), timestamp, str(data[2]))
+                                sql = "UPDATE climate_co2_data2 SET co2_value='%s' WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (co2_value, sitecode, timestamp)
+                                message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
+                                message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
+                                                                                                          
+                    try:
+                        # Execute the SQL command
+                        cursor.execute(sql)
+                        # Commit your changes in the database
+                        db.commit()
+                        print message_success
+                    except:
+                        # Rollback in case there is any error
+                        db.rollback()
+                        print message_failure
 
             # NOTE: only do counter if re-processing full set of data
             if(daterange == ''):                        

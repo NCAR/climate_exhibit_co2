@@ -15,9 +15,9 @@ if (php_sapi_name() != "cli") {
     }
 date_default_timezone_set("Etc/GMT");
 $sitecode = 'nwr';
-$max_value_amt = 300;
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lme"; 
-//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lin"; 
+$max_value_amt = 672;
+//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lme"; 
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -33,8 +33,13 @@ while(!feof($f))
         // format the value
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
-        if(isset($a_data[8])){
-            $co2_value = trim($a_data[8]);
+        if(isset($a_data[11]) || isset($a_data[10])){
+            if($a_data[1] > 2005 || ($a_data[1] == 2005 && $a_data[2] >= 9 && $a_data[3] >=10)){
+                $co2_value = trim($a_data[11]);
+            } else {
+                $co2_value = trim($a_data[10]);
+            }
+            $co2_value = trim($a_data[11]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
                 $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
@@ -42,9 +47,9 @@ while(!feof($f))
                 $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
                 $hour = str_pad($a_data[4], 2, '0', STR_PAD_LEFT);
                 $min = str_pad($a_data[5], 2, '0', STR_PAD_LEFT);
-                $sec = str_pad($a_data[6], 2, '0', STR_PAD_LEFT);
+                $sec = '00';
                 
-                $new_date = $year.'-'.$month.'-'.$day.'T'.$hour.':'.$min.':'.$sec;
+                $new_date = $year.'-'.$month.'-'.$day.' '.$hour.':'.$min.':'.$sec;
 
                 $date = new DateTime($new_date);
                 $date->setTimeZone(new DateTimeZone("Etc/GMT"));
