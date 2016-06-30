@@ -10,6 +10,7 @@ import db_config
 
 argv = sys.argv[1:] 
 totalargs = len(sys.argv)
+total_processed = 0
 starttime = datetime.datetime.now()
 print 'Started at: %s' % starttime.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -20,12 +21,17 @@ cursor = db.cursor()
         
 # function to print usage
 def usage():
-    print 'harvest.py -s <sitecode> -b <begin> -e <end>'
+    print 'harvest.py -s <sitecode> -f <startfromend> -b <startfrombeginning> -e <endvalue>'
+    print ''
     print '<sitecode> can be one of nwr or mlb'
-    print '<begin> can be an integer indicating the number of rows from the end '
-    print 'of the file to begin processing.  No value defaults to all data'
-    print '<end> can be an integer indicating the number of rows from the end '
-    print 'of the file to finish processing'
+    print ''
+    print '<startfrombeginning> can be an integer indicating the number of rows from the beginning of valid data in the file (29 lines from top) to begin processing.'
+    print '<startfromend> can be an integer indicating the number of rows from the end  of the file to begin processing.'
+    print ''
+    print '<endvalue>: if <startfrombeginning> is selected, <endvalue> can be an integer indicating the number of rows from the beginning  of valid data in the file (29 lines from top) to finish processing'
+    print '<endvalue>: if <startfromend> is selected, <endvalue> can be an integer indicating the number of rows from the end of the file to finish processing'
+    print ''
+    print 'only one of -f or -b can be used for a given run and default is all data'
 
 # ~480 per day
 # ~3360 per week
@@ -43,36 +49,58 @@ def retrieve_data(filename):
 #main 
 def main():   
     #retrieve arguments
+    input_beginfromstart = false
+    input_beginfromend = false
     begin = 0
     end = 0
     filename = ''
     sitecode = ''
+    
     try:
-        opts, args = getopt.getopt(argv, "hs:b:e:", ["sitecode=", "begin=", "end="])
+        opts, args = getopt.getopt(argv, "hs:f:b:e:", ["sitecode=", "startfromend=", "startfrombeginning=", "endvalue="])
     except getopt.GetoptError:          
         usage()                      
         sys.exit(2)  
+    # retrieve arguments
     for opt, arg in opts:                
         if opt in ("-h", "--help"): 
             usage()
             sys.exit(2)                  
         elif opt in ("-s", "--sitecode"):              
-            sitecode = str(arg)                 
-        
-        if opt in ("-b", "--begin"): 
+            sitecode = str(arg)     
+            
+        if opt in ("-b", "--startfrombeginning"): 
             begin = int(arg)
-        if opt in ("-e", "--end"): 
+            input_beginfromstart = true
+            
+        if opt in ("-f", "--startfromend"): 
+            begin = int(arg)
+            input_beginfromend = true
+            
+        if opt in ("-e", "--endvalue"): 
             end = int(arg)
-            # ~480 per day
-            # ~3360 per week
-            # ~ 175200 per year
-        
-        # checks - verify end is less than begin  
-        if end > begin:
-            print "end value must be less than begin value"
+            
+    # checks for valid input
+    # ensure only one of -l or -b is chosen    
+    if(input_beginfromend == true and input_beginfromstart == true):
+        print "Only use one of -l or -f for a given run"
+        usage()
+        sys.exit(2)  
+    elif (input_beginfromstart == true):
+        # checks - verify end is greater than begin if end was defined
+        if end != 0 and end < begin:
+            print "end value must be greater than begin value for begin from start"
+            print "selected begin:%i and end:%i  " % (begin, end)
             usage()
             sys.exit(2)  
-
+    else:            
+        # checks - verify end is less than begin  
+        if end > begin:
+            print "end value must be less than begin value for begin from end"
+            print "selected begin:%i and end:%i  " % (begin, end)
+            usage()
+            sys.exit(2)  
+        
     # only proceed if there are arguments        
     if (totalargs > 0):
         str_print = []
@@ -90,10 +118,16 @@ def main():
         # ignore the first 29 lines which are just text file comments
         lines = lines[29:]
         
-        # checks - verify begin and end are less than total lines - 29
-        numlines = len(lines)-29
+        # checks - verify begin and end are less than total lines
+        numlines = len(lines)
+        if (input_beginfromstart == true):
+            if end == 0:
+                # if doing beginfromstart but no end provided, make end the last line
+                end = numlines
+        
         if begin > numlines or end > numlines:
             print "cannot take slice larger that dataset.  Only %i lines available. " % numlines
+            print "provided begin:%i and end:%i" % (begin,end)
             usage()
             sys.exit(2)  
             
@@ -101,10 +135,24 @@ def main():
         # NOTE: only do counter if re-processing full set of data
         if(begin == 0):
             lastlines = lines
-        elif ( end > 0):
-            lastlines = lines[-begin:-end]
-        else:
-            lastlines = lines[-begin:]
+        elif (input_beginfromend == true):
+            print 'processing from end %i to %i' % (begin, end)
+            #processing from end
+            if ( end > 0):
+                lastlines = lines[-begin:-end]
+            else:
+                # process all starting from -begin from end
+                lastlines = lines[-begin:]
+        elif (beginfromstart > 0):
+            # processing from start
+            print 'processing from beginning %i to %i' % (begin, end)
+            if ( end > 0):
+                lastlines = lines[begin:end]
+            else:
+                # process all starting from -begin from start
+                lastlines = lines[begin:]
+            
+        total_processed = len(lastlines)
 
         sql_insert = """INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES(%s,%s,%s)"""
         sql_update = """UPDATE climate_co2_data2 SET co2_value=%s WHERE sitecode=%s AND timestamp_co2_recorded=%s"""
@@ -146,7 +194,7 @@ def main():
                     #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
                     # if more than 1 row - report as error
                     if (numrows > 1):
-                        str_print.append("More than 1 value exists in the db for %s and %s - you should investigate." % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
+                        str_print.append("More than 1 value exists (%i: %i) in the db for %s and %s - you should investigate." % (numrows, int(timestamp), datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
                     else:
                         #check if values are different. If so, update
                         data = cursor.fetchone()
@@ -156,7 +204,7 @@ def main():
                             #message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
                             #message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
                             values_update.append((co2_value, sitecode, timestamp));
-                            str_print.append("Attempting to update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2]))
+                            str_print.append("Attempting to update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, data[2], sitecode))
         #inserts 
         print " \n ".join(str_print)
         if (len(values_insert) > 0):                                                                             
@@ -199,6 +247,9 @@ def main():
         # disconnect from server
         db.close()
         
+        
+    print 'Total items processed: '
+    print total_processed
         
 main()
 endtime = datetime.datetime.now()
