@@ -49,8 +49,9 @@ def retrieve_data(filename):
 #main 
 def main():   
     #retrieve arguments
-    input_beginfromstart = false
-    input_beginfromend = false
+    input_beginfromstart = 0
+    input_beginfromend = 0
+    input_end = 0
     begin = 0
     end = 0
     filename = ''
@@ -71,22 +72,23 @@ def main():
             
         if opt in ("-b", "--startfrombeginning"): 
             begin = int(arg)
-            input_beginfromstart = true
+            input_beginfromstart = 1
             
         if opt in ("-f", "--startfromend"): 
             begin = int(arg)
-            input_beginfromend = true
+            input_beginfromend = 1
             
         if opt in ("-e", "--endvalue"): 
             end = int(arg)
+            input_end = 1
             
     # checks for valid input
     # ensure only one of -l or -b is chosen    
-    if(input_beginfromend == true and input_beginfromstart == true):
+    if(input_beginfromend == 1 and input_beginfromstart == 1):
         print "Only use one of -l or -f for a given run"
         usage()
         sys.exit(2)  
-    elif (input_beginfromstart == true):
+    elif (input_beginfromstart == 1):
         # checks - verify end is greater than begin if end was defined
         if end != 0 and end < begin:
             print "end value must be greater than begin value for begin from start"
@@ -120,10 +122,6 @@ def main():
         
         # checks - verify begin and end are less than total lines
         numlines = len(lines)
-        if (input_beginfromstart == true):
-            if end == 0:
-                # if doing beginfromstart but no end provided, make end the last line
-                end = numlines
         
         if begin > numlines or end > numlines:
             print "cannot take slice larger that dataset.  Only %i lines available. " % numlines
@@ -133,9 +131,9 @@ def main():
             
 
         # NOTE: only do counter if re-processing full set of data
-        if(begin == 0):
+        if(begin == 0 and end == 0):
             lastlines = lines
-        elif (input_beginfromend == true):
+        elif (input_beginfromend == 1):
             print 'processing from end %i to %i' % (begin, end)
             #processing from end
             if ( end > 0):
@@ -143,7 +141,7 @@ def main():
             else:
                 # process all starting from -begin from end
                 lastlines = lines[-begin:]
-        elif (beginfromstart > 0):
+        elif (input_beginfromstart == 1):
             # processing from start
             print 'processing from beginning %i to %i' % (begin, end)
             if ( end > 0):
@@ -151,6 +149,8 @@ def main():
             else:
                 # process all starting from -begin from start
                 lastlines = lines[begin:]
+        else :
+            print 'no begin or end: beginfromstart = %i, beginfromend=%i, end=%i, begin=%i' % (input_beginfromstart, input_beginfromend, end, begin)
             
         total_processed = len(lastlines)
 
