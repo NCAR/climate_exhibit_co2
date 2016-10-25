@@ -6,7 +6,7 @@
 if (php_sapi_name() != "cli") {
     // In cli-mode
     echo "Cannot execute.";
-    exit();
+   // exit();
 } 
 error_reporting(E_ALL);
 set_time_limit(0);
@@ -102,7 +102,6 @@ switch($range){
         // Set the labels every 5 year (i.e. 157680000seconds) and minor ticks every year
         $majortick = 157680000;
         $minortick = 31536000;
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "tenyear":
         $a_range['x_low'] = strtotime("today midnight -10 years");
@@ -112,7 +111,6 @@ switch($range){
         // Set the labels every year (i.e. 31536000seconds) and minor ticks every mmonth
         $majortick = 31536000;
         $minortick = 2628000;
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;    
     case "oneyear":
         $a_range['x_low'] = strtotime("today midnight -1 year");
@@ -122,30 +120,26 @@ switch($range){
         // Set the labels every month (i.e. 2628000seconds) and minor ticks every day
         $majortick = 2628000;
         $minortick = 86400;
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "onemonth":
         $a_range['x_low'] = strtotime("today midnight -1 month");
         $a_range['x_high'] = time();
        // $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->scale->SetDateFormat('M-d');
+        $graph->xaxis->scale->SetDateFormat('M-d H:i');
         //$graph->xaxis->scale->ticks->Set(60*60*24);
         // Set the labels every day (i.e. 86400 seconds) and minor ticks every hour
         $majortick = 86400;
         $minortick = 3600;
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
         break;
     case "oneweek":        
         $a_range['x_low'] = strtotime("today midnight -1 week");
         $a_range['x_high'] = time();
        // $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->scale->SetDateFormat('M-d');
+        $graph->xaxis->scale->SetDateFormat('M-d H:i');
         //$graph->xaxis->scale->ticks->Set(60*60*24);
         // Set the labels every day (i.e. 3600seconds) and minor ticks every hour
-        $majortick = 86400;
-        $minortick = 3600;
-        
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
+        $majortick = 21600;
+        $minortick = 60;
         break;
     case "oneday":        
         $a_range['x_low'] = strtotime("today midnight -1 day");
@@ -153,13 +147,12 @@ switch($range){
        // $tickCond = DSUTILS_DAY1;
         $graph->xaxis->scale->SetDateFormat('H:i');
         $majortick = 3600;
-        $minortick = 60;
-        
-        $graph->xaxis->scale->ticks->Set($majortick,$minortick);
+        $minortick = 60;        
         break;    
 }
-
-
+$graph->xaxis->scale->ticks->Set($majortick,$minortick);
+$graph->SetTickDensity( TICKD_NORMAL );
+//make tick density dense
 $dateUtils = new DateScaleUtils();
 
 function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData,&$a_numrows){
@@ -301,13 +294,6 @@ if($a_numrows['mlo'] > 0){
     $sp0->mark->SetFillColor($fillcolor0);
     $sp0->mark->SetColor($bordercolor0);
     $sp0->mark->SetWidth(5); 
-    /*if($range = 'onemonth' || $range == 'oneweek'){
-
-        $sp0->link->Show();
-        $sp0->link->SetWeight(5);
-        $sp0->link->SetColor('#CC0000');
-    }
-    */
     $graph->Add($sp0);
 }
 
@@ -323,7 +309,13 @@ $graph->legend->SetAbsPos($width/2-100,$height-100,'right','bottom');
 */
 
 if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
-    $myscale = $xdata1;
+    if(count($xdata1) > 0){
+        $myscale = $xdata1;
+    } else if(count($xdata2) > 0){
+        $myscale = $xdata2;
+    } else {
+        $myscale = $xdata0;
+    }
 } else {
     $myscale = $xdata0;
 }
@@ -337,7 +329,7 @@ $graph->xaxis->SetLabelAngle(90);
 $graph->xaxis->SetPos('min');
  
 // Now set the tic positions
-//list($tickPositions,$minTickPositions) = $dateUtils->GetTicks($xdata0);
+//list($tickPositions,$minTickPositions) = $dateUtils->GetTicks($myscale);
 //$graph->xaxis->SetTickPositions($tickPositions,$minTickPositions);
 
 // Add a X-grid
@@ -347,8 +339,8 @@ unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);
 unset($xdata0,$ydata0);
 
-$filename = $imagedir.$imagename.'.jpg';
-$temp_filename = $imagedir.$tempdir.$imagename.'.jpg';
+$filename = $imagedir.$imagename.'2.jpg';
+$temp_filename = $imagedir.$tempdir.$imagename.'2.jpg';
 
 // before rendering, delete the existing, if it exists
 if(file_exists($temp_filename)){
@@ -356,8 +348,11 @@ if(file_exists($temp_filename)){
 }
 echo "writing to ".$temp_filename."\n";
 // render graph
-$graph->Stroke($temp_filename);
-
+try {
+    $graph->Stroke($temp_filename);
+} catch( JpGraphException $e ) {
+    echo 'Error: ' . $e->getMessage()."\n";
+}
 // after create graph copy to final location
 if (!copy($temp_filename, $filename)) {
     echo "failed to copy $temp_filename...\n";

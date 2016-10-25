@@ -104,7 +104,7 @@ def main():
         
         if(sitecode == 'nwr'):
             sitecode = "nwr"
-            filename = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lme"; 
+            filename = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lme"; 
         elif (sitecode == 'mlb'):
             sitecode = "mlb"
             filename = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lme"; 
