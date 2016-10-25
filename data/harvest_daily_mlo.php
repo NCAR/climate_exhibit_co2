@@ -1,5 +1,9 @@
 <?php
-
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
 $source = "http://bluemoon.ucsd.edu/NOAA/mlo_daily.csv";
 echo "Retrieving value from $source\r\n";
 //open url and get value

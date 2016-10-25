@@ -1,4 +1,9 @@
 <?php 
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
 // vars
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $baseurl = 'J:\\Sharon\\xampp\\htdocs\\climate_exhibit_co2\\';
@@ -176,10 +181,17 @@ if(!empty($title)){
  
 // Setup titles and X-axis labels
 //$graph->xaxis->SetLabelFormatCallback('year_callback');
-$graph->xaxis->SetLabelFormatString('Y',true);
+
 $graph->xaxis->SetLabelAngle(90);
  // Get manual tick every second year
-list($tickPos,$minTickPos) = $dateUtils->getTicks($xdata,DSUTILS_YEAR1);
+
+if($source == "mlb"){
+    $graph->xaxis->SetLabelFormatString('M-d',true);
+    list($tickPos,$minTickPos) = $dateUtils->getTicks($xdata,DSUTILS_DAY1);
+} else {
+    $graph->xaxis->SetLabelFormatString('Y',true);
+    list($tickPos,$minTickPos) = $dateUtils->getTicks($xdata,DSUTILS_YEAR1);
+}
 $graph->xaxis->SetTickPositions($tickPos,$minTickPos);
 
 // Setup Y-axis title

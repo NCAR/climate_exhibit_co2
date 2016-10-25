@@ -1,4 +1,9 @@
 <?php
+if (php_sapi_name() != "cli") {
+    // In cli-mode
+    echo "Cannot execute.";
+    exit();
+} 
 $a_final = array();
  $file = "mlo.tsv"; 
  $f = fopen($file, 'r+');

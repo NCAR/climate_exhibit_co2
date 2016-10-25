@@ -9,8 +9,8 @@ if (php_sapi_name() != "cli") {
     } else {    
         require '/home/sclark/db/credentials/credentials.php';
     }
-  set_time_limit(0);  
-$sitecode = 'mlo';
+  set_time_limit(0);
+$sitecode = 'mlb';
 // read in data from tsv
 $a_final = array();
 $file = $sitecode.".tsv"; 
@@ -49,8 +49,10 @@ foreach($a_final as $data){
     
     // first check if these values already exist
     $myquery = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$data[0]'";
+    
     $query = mysql_query($myquery);
     $numrows = mysql_num_rows($query);
+    
     if($numrows == 0){
         $myquery = "INSERT INTO climate_co2_data(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$data[1]', '$data[0]')";
         $query = mysql_query($myquery);

@@ -1,6 +1,6 @@
 <?php
 /**
-*   This harvests NWR (Niwot Ridge) data that are the 15 minute data intervals
+*   This harvests MLB (Mesa Lab) data that are the 15 minute data intervals
 *   from db: climate_co2_data
 **/
 if (php_sapi_name() != "cli") {
@@ -14,10 +14,11 @@ if (php_sapi_name() != "cli") {
         require '/home/sclark/db/credentials/credentials.php';
     }
 date_default_timezone_set("Etc/GMT");
-$sitecode = 'nwr';
+$sitecode = 'mlb';
 $max_value_amt = 672;
-//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lme"; 
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lin"; 
+//$max_value_amt = 5000;
+//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lme"; 
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_MLB_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -33,13 +34,8 @@ while(!feof($f))
         // format the value
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
-        if(isset($a_data[11]) || isset($a_data[10])){
-            if($a_data[1] > 2005 || ($a_data[1] == 2005 && $a_data[2] >= 9 && $a_data[3] >=10)){
-                $co2_value = trim($a_data[11]);
-            } else {
-                $co2_value = trim($a_data[10]);
-            }
-            $co2_value = trim($a_data[11]);
+        if(isset($a_data[9])){
+            $co2_value = trim($a_data[9]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
                 $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
@@ -90,6 +86,8 @@ if ($mysqli->connect_error) {
     exit;
 }
 
+
+
 foreach($a_last_lines as $key=>$value_new){
     // for each value check if it exists in db
     $myquery1 = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
@@ -126,8 +124,10 @@ foreach($a_last_lines as $key=>$value_new){
     }
 }
 
-// close db
+
 $mysqli->close();
+// close db
+
 
 unset($a_last_lines);
 ?>

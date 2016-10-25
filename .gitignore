@@ -1,4 +1,16 @@
 bower_components/*
+node_modules/*
 data/*.tsv
 data/*.txt
 data/*.csv
+data/*.sql
+data/*.gz
+assets/temp/*
+assets/all.jpg
+assets/oneday.jpg
+assets/oneweek.jpg
+assets/onemonth.jpg
+assets/oneyear.jpg
+assets/tenyear.jpg
+assets/all.jpg
+assets/temp/onemonth.jpg

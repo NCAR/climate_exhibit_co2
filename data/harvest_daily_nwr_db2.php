@@ -1,7 +1,7 @@
 <?php
 /**
-*   This harvests NWR (Niwot Ridge) data that are the 15 minute data intervals
-*   from db: climate_co2_data
+*   This harvests NWR (Niwot Ridge) data that are the most granular data intervals (approx every 3 mins)
+*   from db: climate_co2_data2
 **/
 if (php_sapi_name() != "cli") {
     // In cli-mode
@@ -15,9 +15,12 @@ if (php_sapi_name() != "cli") {
     }
 date_default_timezone_set("Etc/GMT");
 $sitecode = 'nwr';
-$max_value_amt = 672;
-//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lme"; 
-$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lin"; 
+// ~480 per day
+// ~3360 per week
+// ~ 175200 per year
+$max_value_amt = 876000;
+$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lme"; 
+//$file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lin"; 
 //$file = '/web/sparkapps/climate_exhibit_co2/data/nwr.txt'; // for testing
 $f = fopen($file, 'r');
 
@@ -33,13 +36,8 @@ while(!feof($f))
         // format the value
         $a_data = explode(" ",$line);
         // only proceed if the array is the proper lenth
-        if(isset($a_data[11]) || isset($a_data[10])){
-            if($a_data[1] > 2005 || ($a_data[1] == 2005 && $a_data[2] >= 9 && $a_data[3] >=10)){
-                $co2_value = trim($a_data[11]);
-            } else {
-                $co2_value = trim($a_data[10]);
-            }
-            $co2_value = trim($a_data[11]);
+        if(isset($a_data[8])){
+            $co2_value = trim($a_data[8]);
             if($co2_value != 'NaN' && $co2_value > 0){   
                 $a_new_data = array();
                 $year = str_pad($a_data[1], 4, '0', STR_PAD_LEFT);
@@ -47,9 +45,9 @@ while(!feof($f))
                 $day = str_pad($a_data[3], 2, '0', STR_PAD_LEFT);
                 $hour = str_pad($a_data[4], 2, '0', STR_PAD_LEFT);
                 $min = str_pad($a_data[5], 2, '0', STR_PAD_LEFT);
-                $sec = '00';
+                $sec = str_pad($a_data[6], 2, '0', STR_PAD_LEFT);
                 
-                $new_date = $year.'-'.$month.'-'.$day.' '.$hour.':'.$min.':'.$sec;
+                $new_date = $year.'-'.$month.'-'.$day.'T'.$hour.':'.$min.':'.$sec;
 
                 $date = new DateTime($new_date);
                 $date->setTimeZone(new DateTimeZone("Etc/GMT"));
@@ -58,6 +56,7 @@ while(!feof($f))
                     
                 array_push($a_last_lines, $a_new_data);
                 if (count($a_last_lines)>$max_value_amt){
+                    echo 'removing unneeded values'."\n";
                    array_shift($a_last_lines);
                 }
             }
@@ -92,7 +91,7 @@ if ($mysqli->connect_error) {
 
 foreach($a_last_lines as $key=>$value_new){
     // for each value check if it exists in db
-    $myquery1 = "SELECT * FROM climate_co2_data WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
+    $myquery1 = "SELECT * FROM climate_co2_data2 WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
     $query1 = $mysqli->query($myquery1);
     if ( ! $query1 ) {
         echo $mysqli->error;
@@ -101,7 +100,7 @@ foreach($a_last_lines as $key=>$value_new){
     $numrows1 = $query1->num_rows;
     // if value does not exit in db then add it
     if($numrows1 == 0){
-        $myquery2 = "INSERT INTO climate_co2_data(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$value_new[1]', '$value_new[0]')";
+        $myquery2 = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('$sitecode', '$value_new[1]', '$value_new[0]')";
         $query2 = $mysqli->query($myquery2);
         if ( ! $query2 ) {
             echo $mysqli->error;
@@ -113,7 +112,7 @@ foreach($a_last_lines as $key=>$value_new){
         $data = $query1->fetch_assoc();
         if($value_new[1] != $data['co2_value']){
             
-            $myquery3 = "UPDATE climate_co2_data SET co2_value='$value_new[1]' WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
+            $myquery3 = "UPDATE climate_co2_data2 SET co2_value='$value_new[1]' WHERE sitecode='$sitecode' AND timestamp_co2_recorded='$value_new[0]'";
             
             $query3 = $mysqli->query($myquery3);
              if ( ! $query3 ) {
