@@ -205,7 +205,7 @@ function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData,&$a_numrows){
                 if($sitecode == 'nwr' || $sitecode == 'mlb'){
                     $aXData[] = $data['timestamp'] - (60*60*6);
                 } else {
-                    $aXData[] = $data['timestamp'];
+                    $aXData[] = $data['timestamp'] - (60*60*6);
                 }
                     $aYData[] = $data['value'];
                // }
