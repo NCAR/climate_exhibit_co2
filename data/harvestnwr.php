@@ -5,7 +5,7 @@ if (php_sapi_name() != "cli") {
     exit();
 } 
 $a_final = array();
- $file = "http://www.eol.ucar.edu/homes/stephens/RACCOON/NCAR_NWR_most_recent.lhr"; 
+ $file = "http://www.eol.ucar.edu/homes/stephens/RACCOONlab/NCAR_NWR_most_recent.lhr"; 
  //$file = 'nwr.txt';
  $f = fopen($file, 'r');
  $last_line = '';

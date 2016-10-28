@@ -176,37 +176,41 @@ def main():
                     date = datetime.datetime.strptime(date_text, "%Y-%m-%dT%H:%M:%S")
                     timestamp = calendar.timegm(date.utctimetuple())
                     co2_value = parts[8]
+                    hgt = parts[7]
 
-
-                    # see if already exists in db
-                    sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
-                    # Execute the SQL command
-                    cursor.execute(sql)
-                    # ensure no results before insert
-                    numrows = cursor.rowcount
-                    time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
-                    if (numrows == 0):
-                        #db_transaction('insert', sitecode, str(co2_value), timestamp, 0)
-                        #sql = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('%s','%s','%i')" % (sitecode, co2_value, timestamp)
-                        # message_success = "Added %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)
-                        # message_failure = "Could not commit %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)  
-                        values_insert.append((sitecode, co2_value, timestamp));
-                        str_print.append("Attempting to add %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode))
-                    else:
-                        #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
-                        # if more than 1 row - report as error
-                        if (numrows > 1):
-                            str_print.append("More than 1 value exists (%i: %i) in the db for %s and %s - you should investigate." % (numrows, int(timestamp), datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
+                    # oct 28, 2016: Britt: if HGT = 0, then it is surveillence value and should be filtered out
+                    if(hgt != 0):
+                        # see if already exists in db
+                        sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
+                        # Execute the SQL command
+                        cursor.execute(sql)
+                        # ensure no results before insert
+                        numrows = cursor.rowcount
+                        time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
+                        if (numrows == 0):
+                            #db_transaction('insert', sitecode, str(co2_value), timestamp, 0)
+                            #sql = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('%s','%s','%i')" % (sitecode, co2_value, timestamp)
+                            # message_success = "Added %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)
+                            # message_failure = "Could not commit %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)  
+                            values_insert.append((sitecode, co2_value, timestamp));
+                            str_print.append("Attempting to add %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode))
                         else:
-                            #check if values are different. If so, update
-                            data = cursor.fetchone()
-                            if (str(data[2]) != str(co2_value)):
-                                #db_transaction('update', sitecode, str(co2_value), timestamp, str(data[2]))
-                                #sql = "UPDATE climate_co2_data2 SET co2_value='%s' WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (co2_value, sitecode, timestamp)
-                                #message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
-                                #message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
-                                values_update.append((co2_value, sitecode, timestamp));
-                                str_print.append("Attempting to update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, data[2], sitecode))
+                            #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
+                            # if more than 1 row - report as error
+                            if (numrows > 1):
+                                str_print.append("More than 1 value exists (%i: %i) in the db for %s and %s - you should investigate." % (numrows, int(timestamp), datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
+                            else:
+                                #check if values are different. If so, update
+                                data = cursor.fetchone()
+                                if (str(data[2]) != str(co2_value)):
+                                    #db_transaction('update', sitecode, str(co2_value), timestamp, str(data[2]))
+                                    #sql = "UPDATE climate_co2_data2 SET co2_value='%s' WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (co2_value, sitecode, timestamp)
+                                    #message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
+                                    #message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
+                                    values_update.append((co2_value, sitecode, timestamp));
+                                    str_print.append("Attempting to update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, data[2], sitecode))
+                    else:
+                        print "%s value is invalid for %s (surveillence value)." % (co2_value,date_text)
             #inserts 
             print " \n ".join(str_print)
             if (len(values_insert) > 0):                                                                             
