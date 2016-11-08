@@ -33,36 +33,19 @@ def usage():
 # ~ 175200 per year
 
 # funtion to retrieve list of data
-def retrieve_data(filename,command_type, begin,end):
+def retrieve_data(filename):
     # open external file to retrieve data
-    res = []
-    begin_modified = 0
-    end_modified = 0
-    
     f = urllib2.urlopen(filename)
-    lines = f.readlines()
-    totallines = len(lines)
+    myfile = f.read()
     f.close()
-    
-    if command_type == 'bfs':
-        begin_modified = begin + 29
-        end_modified = end + 29
-    elif command_type == 'bfe':
-        begin_modified = totallines - begin
-        end_modified = totallines - end
-        if(begin_modified < 29):
-            begin_modified = 29
-        if(end_modified < 29):
-            end_modified = 29
-            
-    res = lines[begin_modified:end_modified]
-
-    return res
+    # split on new lines
+    return myfile.split("\n")
                     
 #main 
 def main():   
     #retrieve arguments
-    command_type = ''
+    input_beginfromstart = 0
+    input_beginfromend = 0
     input_end = 0
     begin = 0
     end = 0
@@ -84,11 +67,11 @@ def main():
             
         if opt in ("-b", "--startfrombeginning"): 
             begin = int(arg)
-            command_type = 'bfs'
+            input_beginfromstart = 1
             
         if opt in ("-f", "--startfromend"): 
             begin = int(arg)
-            command_type = 'bfe'
+            input_beginfromend = 1
             
         if opt in ("-e", "--endvalue"): 
             end = int(arg)
@@ -96,7 +79,11 @@ def main():
             
     # checks for valid input
     # ensure only one of -l or -b is chosen    
-    if (command_type == 'bfs'):
+    if(input_beginfromend == 1 and input_beginfromstart == 1):
+        print "Only use one of -l or -f for a given run"
+        usage()
+        sys.exit(2)  
+    elif (input_beginfromstart == 1):
         # checks - verify end is greater than begin if end was defined
         if end != 0 and end < begin:
             print "end value must be greater than begin value for begin from start"
@@ -124,8 +111,43 @@ def main():
         else:
             usage()
             sys.exit(2)
-        lines = retrieve_data(filename,command_type, begin,end)
-        total_processed = len(lines)
+        lines = retrieve_data(filename)
+        # ignore the first 29 lines which are just text file comments
+        lines = lines[29:]
+        
+        # checks - verify begin and end are less than total lines
+        numlines = len(lines)
+        
+        if begin > numlines or end > numlines:
+            print "cannot take slice larger that dataset.  Only %i lines available. " % numlines
+            print "provided begin:%i and end:%i" % (begin,end)
+            usage()
+            sys.exit(2)  
+            
+
+        # NOTE: only do counter if re-processing full set of data
+        if(begin == 0 and end == 0):
+            lastlines = lines
+        elif (input_beginfromend == 1):
+            print 'processing from end %i to %i' % (begin, end)
+            #processing from end
+            if ( end > 0):
+                lastlines = lines[-begin:-end]
+            else:
+                # process all starting from -begin from end
+                lastlines = lines[-begin:]
+        elif (input_beginfromstart == 1):
+            # processing from start
+            print 'processing from beginning %i to %i' % (begin, end)
+            if ( end > 0):
+                lastlines = lines[begin:end]
+            else:
+                # process all starting from -begin from start
+                lastlines = lines[begin:]
+        else :
+            print 'no begin or end: beginfromstart = %i, beginfromend=%i, end=%i, begin=%i' % (input_beginfromstart, input_beginfromend, end, begin)
+            
+        total_processed = len(lastlines)
 
         sql_insert = """INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES(%s,%s,%s)"""
         sql_update = """UPDATE climate_co2_data2 SET co2_value=%s WHERE sitecode=%s AND timestamp_co2_recorded=%s"""
@@ -140,7 +162,9 @@ def main():
             # prepare a cursor object using cursor() method
             cursor = db.cursor()
 
-            for line in lines:
+            for line in lastlines:
+                message_failure = ''
+                message_success = ''
                 parts = line.split()
 
                 if (len(parts) > 0):
@@ -153,8 +177,8 @@ def main():
                     date_text = year+'-'+month+'-'+day+'T'+hour+':'+minute+':'+sec;
                     date = datetime.datetime.strptime(date_text, "%Y-%m-%dT%H:%M:%S")
                     timestamp = calendar.timegm(date.utctimetuple())
-                    co2_value = float(parts[8])
-                    hgt = float(parts[7])
+                    co2_value = parts[8]
+                    hgt = parts[7]
 
                     # oct 28, 2016: Britt: if HGT = 0, then it is surveillence value and should be filtered out
                     if(hgt != 0):
@@ -166,8 +190,12 @@ def main():
                         numrows = cursor.rowcount
                         time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                         if (numrows == 0):
+                            #db_transaction('insert', sitecode, str(co2_value), timestamp, 0)
+                            #sql = "INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES('%s','%s','%i')" % (sitecode, co2_value, timestamp)
+                            # message_success = "Added %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)
+                            # message_failure = "Could not commit %s - %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode)  
                             values_insert.append((sitecode, co2_value, timestamp));
-                            str_print.append("Attempting to add %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Attempting to add %s - %s for %s to db where HGT=%s.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                         else:
                             #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
                             # if more than 1 row - report as error
@@ -177,8 +205,12 @@ def main():
                                 #check if values are different. If so, update
                                 data = cursor.fetchone()
                                 if (str(data[2]) != str(co2_value)):
+                                    #db_transaction('update', sitecode, str(co2_value), timestamp, str(data[2]))
+                                    #sql = "UPDATE climate_co2_data2 SET co2_value='%s' WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (co2_value, sitecode, timestamp)
+                                    #message_success = "Updated %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
+                                    #message_failure = "Could not update %s - %s from %s for %s to db.\r\n" % (time_formatted, co2_value, sitecode, data[2])
                                     values_update.append((co2_value, sitecode, timestamp));
-                                    str_print.append("Attempting to update %s - %.3f from %s for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, data[2], sitecode, hgt))
+                                    str_print.append("Attempting to update %s - %s from %s for %s to db where HGT=%s.\r\n" % (time_formatted, co2_value, data[2], sitecode, hgt))
                     else:
                         # there are some hgt = 0, see if already exists in db
                         sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND active='1' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
@@ -188,11 +220,11 @@ def main():
                         numrows = cursor.rowcount
                         time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                         if (numrows == 0):
-                            str_print.append("Filtering out %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Filtering out %s - %s for %s to db where HGT=%s.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                         else:
                             #already exists so make inactive
                             values_update_inactive.append((sitecode, timestamp));
-                            str_print.append("Setting inactive %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Setting inactive %s - %s for %s to db where HGT=%s.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                             
                         
             #inserts 
@@ -200,9 +232,11 @@ def main():
             if (len(values_insert) > 0):                                                                             
                 try:
                     # Execute the SQL command
+                    #cursor.execute(sql)
                     cursor.executemany(sql_insert, values_insert)
                     # Commit your changes in the database
                     db.commit()
+                    #print message_success
                     print 'Data committed'
                 except MySQLdb.Error, e:
                     try:
@@ -211,14 +245,17 @@ def main():
                         print "MySQL Error: %s" % str(e)
                     # Rollback in case there is any error
                     db.rollback()
+                    #print message_failure
                     print "Could not commit"    
             #updates
             if (len(values_update) > 0):                                                                             
                 try:
                     # Execute the SQL command
+                    #cursor.execute(sql)
                     cursor.executemany(sql_update, values_update)
                     # Commit your changes in the database
                     db.commit()
+                    #print message_success
                     print 'Data updated'
                 except MySQLdb.Error, e:
                     try:
@@ -227,14 +264,17 @@ def main():
                         print "MySQL Error: %s" % str(e)
                     # Rollback in case there is any error
                     db.rollback()
+                    #print message_failure
                     print "Could not update"      
             #updates_inactive
             if (len(values_update_inactive) > 0):                                                                             
                 try:
                     # Execute the SQL command
+                    #cursor.execute(sql)
                     cursor.executemany(sql_update_inactive, values_update_inactive)
                     # Commit your changes in the database
                     db.commit()
+                    #print message_success
                     print 'Data updated to make lines inactive'
                 except MySQLdb.Error, e:
                     try:
@@ -243,6 +283,7 @@ def main():
                         print "MySQL Error: %s" % str(e)
                     # Rollback in case there is any error
                     db.rollback()
+                    #print message_failure
                     print "Could not update to make lines inactive"       
         finally:
             # disconnect from server

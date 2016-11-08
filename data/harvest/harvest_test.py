@@ -56,7 +56,7 @@ def retrieve_data(filename,command_type, begin,end):
             end_modified = 29
             
     res = lines[begin_modified:end_modified]
-
+    print "Gathered relevant lines"
     return res
                     
 #main 
@@ -127,8 +127,8 @@ def main():
         lines = retrieve_data(filename,command_type, begin,end)
         total_processed = len(lines)
 
-        sql_insert = """INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES(%s,%s,%s)"""
-        sql_update = """UPDATE climate_co2_data2 SET co2_value=%s WHERE sitecode=%s AND timestamp_co2_recorded=%s"""
+        sql_insert = """INSERT INTO climate_co2_data2(sitecode, co2_value, timestamp_co2_recorded) VALUES(%s,%.3f,%s)"""
+        sql_update = """UPDATE climate_co2_data2 SET co2_value=%.3f WHERE sitecode=%s AND timestamp_co2_recorded=%s"""
         sql_update_inactive = """UPDATE climate_co2_data2 SET active=0 WHERE sitecode=%s AND timestamp_co2_recorded=%s"""
         values_insert = []
         values_update = []
@@ -155,7 +155,11 @@ def main():
                     timestamp = calendar.timegm(date.utctimetuple())
                     co2_value = float(parts[8])
                     hgt = float(parts[7])
+                    print "parsed with co2=%.3f on %s"%(co2_value, date_text)
 
+                    if(co2_value < 380):
+                        print "CO2=%.3f on %s when HGT=%.3f"%(co2_value, date_text,hgt)
+                    
                     # oct 28, 2016: Britt: if HGT = 0, then it is surveillence value and should be filtered out
                     if(hgt != 0):
                         # see if already exists in db
@@ -166,8 +170,9 @@ def main():
                         numrows = cursor.rowcount
                         time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                         if (numrows == 0):
+                            print 'no'
                             values_insert.append((sitecode, co2_value, timestamp));
-                            str_print.append("Attempting to add %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Attempting to add %s - %.3f for %s to db where HGT=%.3f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                         else:
                             #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
                             # if more than 1 row - report as error
@@ -178,8 +183,9 @@ def main():
                                 data = cursor.fetchone()
                                 if (str(data[2]) != str(co2_value)):
                                     values_update.append((co2_value, sitecode, timestamp));
-                                    str_print.append("Attempting to update %s - %.3f from %s for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, data[2], sitecode, hgt))
+                                    str_print.append("Attempting to update %s - %.3f from %s for %s to db where HGT=%.3f.\r\n" % (time_formatted, co2_value, data[2], sitecode, hgt))
                     else:
+                        print 'invalid'
                         # there are some hgt = 0, see if already exists in db
                         sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND active='1' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
                         # Execute the SQL command
@@ -188,62 +194,13 @@ def main():
                         numrows = cursor.rowcount
                         time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                         if (numrows == 0):
-                            str_print.append("Filtering out %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Filtering out %s - %.3f for %s to db where HGT=%.3f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                         else:
                             #already exists so make inactive
                             values_update_inactive.append((sitecode, timestamp));
-                            str_print.append("Setting inactive %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
+                            str_print.append("Setting inactive %s - %.3f for %s to db where HGT=%.3f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                             
-                        
-            #inserts 
-            print " \n ".join(str_print)
-            if (len(values_insert) > 0):                                                                             
-                try:
-                    # Execute the SQL command
-                    cursor.executemany(sql_insert, values_insert)
-                    # Commit your changes in the database
-                    db.commit()
-                    print 'Data committed'
-                except MySQLdb.Error, e:
-                    try:
-                        print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                    except IndexError:
-                        print "MySQL Error: %s" % str(e)
-                    # Rollback in case there is any error
-                    db.rollback()
-                    print "Could not commit"    
-            #updates
-            if (len(values_update) > 0):                                                                             
-                try:
-                    # Execute the SQL command
-                    cursor.executemany(sql_update, values_update)
-                    # Commit your changes in the database
-                    db.commit()
-                    print 'Data updated'
-                except MySQLdb.Error, e:
-                    try:
-                        print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                    except IndexError:
-                        print "MySQL Error: %s" % str(e)
-                    # Rollback in case there is any error
-                    db.rollback()
-                    print "Could not update"      
-            #updates_inactive
-            if (len(values_update_inactive) > 0):                                                                             
-                try:
-                    # Execute the SQL command
-                    cursor.executemany(sql_update_inactive, values_update_inactive)
-                    # Commit your changes in the database
-                    db.commit()
-                    print 'Data updated to make lines inactive'
-                except MySQLdb.Error, e:
-                    try:
-                        print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                    except IndexError:
-                        print "MySQL Error: %s" % str(e)
-                    # Rollback in case there is any error
-                    db.rollback()
-                    print "Could not update to make lines inactive"       
+               
         finally:
             # disconnect from server
             db.close()
