@@ -125,7 +125,7 @@ switch($range){
         $a_range['x_low'] = strtotime("today midnight -1 month");
         $a_range['x_high'] = time();
        // $tickCond = DSUTILS_DAY1;
-        $graph->xaxis->scale->SetDateFormat('M-d H:i');
+        $graph->xaxis->scale->SetDateFormat('M-d');
         //$graph->xaxis->scale->ticks->Set(60*60*24);
         // Set the labels every day (i.e. 86400 seconds) and minor ticks every hour
         $majortick = 86400;
@@ -266,7 +266,7 @@ if($a_numrows['mlb'] > 0){
     $sp2->mark->SetType(MARK_UTRIANGLE);
     $sp2->mark->SetFillColor($fillcolor2);
     $sp2->mark->SetColor($bordercolor2);
-    $sp2->mark->SetWidth(5);
+    $sp2->mark->SetWidth(2);
     $graph->Add($sp2);
 }
 
@@ -279,7 +279,7 @@ if($a_numrows['nwr'] > 0){
     $sp1->mark->SetType(MARK_SQUARE);
     $sp1->mark->SetFillColor($fillcolor1);
     $sp1->mark->SetColor($bordercolor1);
-    $sp1->mark->SetWidth(5);
+    $sp1->mark->SetWidth(2);
     $graph->Add($sp1);
 }
 
@@ -293,7 +293,7 @@ if($a_numrows['mlo'] > 0){
     $sp0->mark->SetType(MARK_FILLEDCIRCLE);
     $sp0->mark->SetFillColor($fillcolor0);
     $sp0->mark->SetColor($bordercolor0);
-    $sp0->mark->SetWidth(5); 
+    $sp0->mark->SetWidth(2); 
     $graph->Add($sp0);
 }
 
