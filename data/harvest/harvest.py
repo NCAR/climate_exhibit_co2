@@ -153,11 +153,13 @@ def main():
                     date_text = year+'-'+month+'-'+day+'T'+hour+':'+minute+':'+sec;
                     date = datetime.datetime.strptime(date_text, "%Y-%m-%dT%H:%M:%S")
                     timestamp = calendar.timegm(date.utctimetuple())
+                    nwr_check_date = datetime.date(2005,10,12)
                     co2_value = float(parts[8])
                     hgt = float(parts[7])
-
+ 
                     # oct 28, 2016: Britt: if HGT = 0, then it is surveillence value and should be filtered out
-                    if(hgt != 0):
+                    # nov 10, 2016: Britt states that should only use 3.5 hgt before oct 12, 2005, and from 5.1 afterwards for nwr data
+                    if((sitecode == 'mlb' and hgt != 0) or ((sitecode == 'nwr' and timestamp < 1129075200 and hgt == 3.5) or (sitecode == 'nwr' and timestamp >= 1129075200 and hgt == 5.1))):
                         # see if already exists in db
                         sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
                         # Execute the SQL command
@@ -169,8 +171,8 @@ def main():
                             values_insert.append((sitecode, co2_value, timestamp));
                             str_print.append("Attempting to add %s - %.3f for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, sitecode,hgt))
                         else:
-                            #str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
-                            # if more than 1 row - report as error
+                            str_print.append("Value already exists on %s for %s.\r\n" % (datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
+                            #if more than 1 row - report as error
                             if (numrows > 1):
                                 str_print.append("More than 1 value exists (%i: %i) in the db for %s and %s - you should investigate." % (numrows, int(timestamp), datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S'), sitecode))
                             else:
@@ -180,11 +182,11 @@ def main():
                                     values_update.append((co2_value, sitecode, timestamp));
                                     str_print.append("Attempting to update %s - %.3f from %s for %s to db where HGT=%.1f.\r\n" % (time_formatted, co2_value, data[2], sitecode, hgt))
                     else:
-                        # there are some hgt = 0, see if already exists in db
+                        # there are some hgt = 0, or bad nwr values see if already exists in db
                         sql = "SELECT * FROM climate_co2_data2 WHERE sitecode='%s' AND active='1' AND timestamp_co2_recorded='%i'" % (sitecode , timestamp)
                         # Execute the SQL command
                         cursor.execute(sql)
-                        # ensure no results before insert
+                        # ensure no results before update
                         numrows = cursor.rowcount
                         time_formatted = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
                         if (numrows == 0):
