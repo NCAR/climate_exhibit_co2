@@ -22,7 +22,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
    $host = 'sql.ucar.edu';
     $baseurl = '/web/sparkapps/climate_exhibit_co2/';
     $path = "/web/sparkapps/libraries/php/jpgraph/src/";
-    $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
+    $imagedir = "/web/sparkapps/assets/climate_exhibit_co2/";
   
     require '/home/sclark/db/credentials/credentials.php';
 }
@@ -319,6 +319,10 @@ if($range == 'oneweek' || $range == 'oneday' || $range == 'onemonth'){
 } else {
     $myscale = $xdata0;
 }
+
+if($range == 'oneweek' || $range == 'oneday'){
+    $graph->xaxis->SetTextLabelInterval(2);
+}
 $graph ->xaxis->scale->SetDateAlign( DAYADJ_1);
 //$graph->xaxis->SetFont(FF_FONT2,FS_NORMAL,12);
 // Make sure that the X-axis is always at the bottom of the scale
@@ -333,7 +337,7 @@ $graph->xaxis->SetPos('min');
 //$graph->xaxis->SetTickPositions($tickPositions,$minTickPositions);
 
 // Add a X-grid
-//$graph->xgrid->Show();
+$graph->xgrid->Show();
 
 unset($xdata2,$ydata2);
 unset($xdata1,$ydata1);
