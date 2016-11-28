@@ -200,7 +200,7 @@ function readData($mysqli,$sitecode, $a_range, &$aXData, &$aYData,&$a_numrows){
                 } else {
                     $aXData[] = $data['timestamp'] - (60*60*6);
                 }
-                    $aYData[] = $data['value'];
+                $aYData[] = $data['value'];
                // }
             }
         }    
@@ -236,6 +236,7 @@ if ($mysqli->connect_error) {
 $yMax = 450;
 $yMin = 0;
 $myquery = "SELECT MIN(co2_value) as ymin, MAX(co2_value) as ymax FROM climate_co2_data2 WHERE timestamp_co2_recorded >= ".$a_range['x_low']." AND timestamp_co2_recorded <= ".$a_range['x_high']." AND active='1'";
+//$myquery = "SELECT MIN(co2_value) as ymin, MAX(co2_value) as ymax FROM climate_co2_data2 WHERE active='1'";
 $query = $mysqli->query($myquery);
 if ( ! $query ) {
     echo $mysqli->errno;
@@ -266,7 +267,7 @@ if($a_numrows['mlb'] > 0){
     $sp2->mark->SetType(MARK_UTRIANGLE);
     $sp2->mark->SetFillColor($fillcolor2);
     $sp2->mark->SetColor($bordercolor2);
-    $sp2->mark->SetWidth(2);
+    $sp2->mark->SetWidth(4);
     $graph->Add($sp2);
 }
 
@@ -279,7 +280,7 @@ if($a_numrows['nwr'] > 0){
     $sp1->mark->SetType(MARK_SQUARE);
     $sp1->mark->SetFillColor($fillcolor1);
     $sp1->mark->SetColor($bordercolor1);
-    $sp1->mark->SetWidth(2);
+    $sp1->mark->SetWidth(4);
     $graph->Add($sp1);
 }
 
@@ -293,7 +294,7 @@ if($a_numrows['mlo'] > 0){
     $sp0->mark->SetType(MARK_FILLEDCIRCLE);
     $sp0->mark->SetFillColor($fillcolor0);
     $sp0->mark->SetColor($bordercolor0);
-    $sp0->mark->SetWidth(2); 
+    $sp0->mark->SetWidth(4); 
     $graph->Add($sp0);
 }
 

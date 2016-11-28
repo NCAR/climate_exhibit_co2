@@ -22,7 +22,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
    $host = 'sql.ucar.edu';
     $baseurl = '/web/sparkapps/climate_exhibit_co2/';
     $path = "/web/sparkapps/libraries/php/jpgraph/src/";
-    $imagedir = "/web/sparkapps/climate_exhibit_co2/assets/";
+    $imagedir = "/web/sparkapps/assets/climate_exhibit_co2/";
   
     require '/home/sclark/db/credentials/credentials.php';
 }
