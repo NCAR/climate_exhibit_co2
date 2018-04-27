@@ -6,15 +6,8 @@ Climate Exhibit CO2 Display
 AngularJS to run the CO2 display in the climate exhibit
 
 
-## Installation
-
-use bower to install the following
-
-angular
-
-angular-route
-
-angular-sanitize
+## Requires
+Functionality from: https://github.com/NCAR/ml_exhibits_core/
 
 
 ## Maintainers/Sponsors
